@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enum\User\UserRoleEnum;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -49,5 +50,11 @@ class User extends Authenticatable
     public function trasactions()
     {
         return $this->hasMany(Transaction::class);
+    }
+
+    public function orders()
+    {
+//        'seller_id', 'customer_id'
+        return $this->hasMany(Order::class, $this->role == UserRoleEnum::SELLER ? 'seller_id' : "customer_id");
     }
 }

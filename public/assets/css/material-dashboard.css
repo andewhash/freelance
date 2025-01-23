@@ -8,6 +8,7 @@
 .form-control {
     border: 1px solid silver !important;
     padding-left: 10px !important;
+    padding-right: 10px !important;
 }
 :root,
 [data-bs-theme=light] {

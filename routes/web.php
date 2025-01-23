@@ -25,6 +25,11 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/profile/update-image', [ProfileController::class, 'updateImage'])->name('profile.updateImage');
 
+    Route::get('/orders', [ProfileController::class, 'orders'])->name('orders');
+    Route::get('/orders/{order}', [ProfileController::class, 'showOrder'])->name('orders.show');
+    Route::get('/profile/orders/', [ProfileController::class, 'profileOrders'])->name('profile.orders');
+    Route::get('/profile/responses/', [ProfileController::class, 'responses'])->name('profile.responses');
+    Route::post('/order/{id}/propose', [ProfileController::class, 'orderPropose'])->name('orders.propose');
 });
 
 // Admin

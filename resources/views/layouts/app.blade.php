@@ -36,22 +36,22 @@
                     <div class="collapse navbar-collapse w-100 pt-3 pb-2 py-lg-0" id="navigation">
                         <ul class="navbar-nav navbar-nav-hover ms-auto">
                             <li class="nav-item d-flex align-items-center mx-2">
-                                <a href="#components" role="button" class="nav-link ps-2 d-flex cursor-pointer align-items-center">
+                                <a href="{{route('orders')}}" role="button" class="nav-link ps-2 d-flex cursor-pointer align-items-center">
                                     Поиск задач
                                 </a>
                             </li>
                             <li class="nav-item d-flex align-items-center mx-2">
-                                <a href="#blocks" role="button" class="nav-link ps-2 d-flex cursor-pointer align-items-center">
+                                <a href="{{route('profile.orders')}}" role="button" class="nav-link ps-2 d-flex cursor-pointer align-items-center">
                                     Мои работы
                                 </a>
                             </li>
                             <li class="nav-item d-flex align-items-center mx-2">
-                                <a href="#docs" role="button" class="nav-link ps-2 d-flex cursor-pointer align-items-center">
+                                <a href="{{'profile.chats'}}" role="button" class="nav-link ps-2 d-flex cursor-pointer align-items-center">
                                     Сообщения
                                 </a>
                             </li>
                             <li class="nav-item d-flex align-items-center mx-2">
-                                <a href="#pricing" role="button" class="nav-link ps-2 d-flex cursor-pointer align-items-center">
+                                <a href="{{'profile'}}" role="button" class="nav-link ps-2 d-flex cursor-pointer align-items-center">
                                     Кабинет заказчика
                                 </a>
                             </li>
