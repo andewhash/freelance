@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ChatController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AdminController;
@@ -25,11 +26,24 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/profile/update-image', [ProfileController::class, 'updateImage'])->name('profile.updateImage');
 
-    Route::get('/orders', [ProfileController::class, 'orders'])->name('orders');
-    Route::get('/orders/{order}', [ProfileController::class, 'showOrder'])->name('orders.show');
+    Route::get('/requests', [ProfileController::class, 'requests'])->name('orders');
+    Route::get('/requests/{request}', [ProfileController::class, 'showRequests'])->name('orders.show');
     Route::get('/profile/orders/', [ProfileController::class, 'profileOrders'])->name('profile.orders');
     Route::get('/profile/responses/', [ProfileController::class, 'responses'])->name('profile.responses');
     Route::post('/order/{id}/propose', [ProfileController::class, 'orderPropose'])->name('orders.propose');
+    Route::post('/profile/orders/update', [ProfileController::class, 'updateStatus'])->name('profile.orders.update');
+
+    Route::get('/chats', [ChatController::class, 'index'])->name('profile.chats');
+    Route::get('/chats/{chat}', [ChatController::class, 'show'])->name('profile.chats.show');
+    Route::post('/chats/{chat}/send', [ChatController::class, 'send'])->name('profile.chats.send');
+
+    Route::group(['prefix' => 'customer/', 'as' => 'customer.'], function () {
+        Route::resource('requests', \App\Http\Controllers\RequestController::class)->except(['show']);
+        Route::get('requests/{request}/responses', [\App\Http\Controllers\RequestController::class, 'responses'])->name('requests.responses');
+        Route::post('requests/{request}/responses/{response}/accept', [\App\Http\Controllers\RequestController::class, 'accept'])->name('requests.accept');
+
+        Route::get('/orders/create', [\App\Http\Controllers\CustomerController::class, 'createOrder'])->name('orders.create');
+    });
 });
 
 // Admin

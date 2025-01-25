@@ -65,8 +65,8 @@
                                 <!-- Роль (заказчик или продавец) -->
                                 <div class="input-group input-group-outline my-3">
                                     <select name="role" class="form-control @error('role') is-invalid @enderror">
-                                        <option value="customer" {{ old('role') == 'customer' ? 'selected' : '' }}>Заказчик</option>
-                                        <option value="seller" {{ old('role') == 'seller' ? 'selected' : '' }}>Продавец</option>
+                                        <option value="{{\App\Enum\User\UserRoleEnum::CUSTOMER}}" {{ old('role') == \App\Enum\User\UserRoleEnum::CUSTOMER ? 'selected' : '' }}>Заказчик</option>
+                                        <option value="{{\App\Enum\User\UserRoleEnum::SELLER}}" {{ old('role') == \App\Enum\User\UserRoleEnum::SELLER ? 'selected' : '' }}>Продавец</option>
                                     </select>
                                     @error('role')
                                     <div class="invalid-feedback">{{ $message }}</div>

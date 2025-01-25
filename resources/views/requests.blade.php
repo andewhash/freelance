@@ -69,21 +69,21 @@
                         </div>
 
                         <div class="row">
-                            @foreach ($orders as $order)
+                            @foreach ($requests as $request)
                                 <div class="col-12 ">
                                     <div class="card mb-4">
                                         <div class="card-header">
-                                            <h5 class="card-title">Заказ #{{ $order->id }}</h5>
+                                            <h5 class="card-title">Заказ #{{ $request->id }}</h5>
                                         </div>
                                         <div class="card-body">
-                                            <p><strong>Сумма:</strong> <span class="text-success">{{ $order->price }} ₽</span></p>
+                                            <p><strong>Сумма:</strong> <span class="text-success">{{ $request->price }} ₽</span></p>
                                         </div>
 
                                         <div class="card-footer d-flex justify-content-between">
                                             <!-- Кнопка откликнуться -->
-                                            <p><strong>Дата:</strong> {{ $order->created_at->format('d.m.Y') }}</p>
+                                            <p><strong>Дата:</strong> {{ $request->created_at->format('d.m.Y') }}</p>
 
-                                            <a href="{{ route('orders.show', $order->id) }}" class="btn btn-success ms-2">Откликнуться</a>
+                                            <a href="{{ route('orders.show', $request->id) }}" class="btn btn-success ms-2">Откликнуться</a>
                                         </div>
                                     </div>
                                 </div>
@@ -92,7 +92,7 @@
 
                         <!-- Пагинация -->
                         <div class="d-flex justify-content-center">
-                            {{ $orders->links() }}
+                            {{ $requests->links() }}
                         </div>
                     </div>
                 </div>

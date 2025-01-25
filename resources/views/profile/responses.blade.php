@@ -39,20 +39,20 @@
                         <div class="row">
                             @foreach ($responses as $response)
                                 @php
-                                $order = $response->order;
+                                $request = $response->request;
                                 @endphp
                                 <div class="col-12 ">
                                     <div class="card mb-4">
                                         <div class="card-header">
-                                            <h5 class="card-title">Заказ #{{ $order->id }}</h5>
+                                            <h5 class="card-title">Заказ #{{ $request->id }}</h5>
                                         </div>
                                         <div class="card-body">
-                                            <p><strong>Сумма:</strong> <span class="text-success">{{ $order->price }} ₽</span></p>
+                                            <p><strong>Сумма:</strong> <span class="text-success">{{ $request->price }} ₽</span></p>
                                         </div>
 
                                         <div class="card-footer d-flex flex-column">
                                             <!-- Кнопка откликнуться -->
-                                            <p><strong>Дата:</strong> {{ $order->created_at->format('d.m.Y') }}</p>
+                                            <p><strong>Дата:</strong> {{ $request->created_at->format('d.m.Y') }}</p>
                                             <div>
                                                 <h4>Мое предложение</h4>
                                                 <p>

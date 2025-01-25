@@ -1,4 +1,4 @@
-<!-- resources/views/admin/orders.blade.php -->
+<!-- resources/views/admin/requests.blade.php -->
 @extends('layouts.admin')
 
 @section('content')

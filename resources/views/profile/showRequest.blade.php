@@ -7,12 +7,12 @@
                 <!-- Блок с описанием заказа -->
                 <div class="card mb-4 mt-5">
                     <div class="card-header">
-                        <h4>Заказ #{{ $order->id }}</h4>
+                        <h4>Заказ #{{ $request->id }}</h4>
                     </div>
                     <div class="card-body">
-                        <p><strong>Дата заказа:</strong> {{ $order->created_at->format('d.m.Y') }}</p>
-                        <p><strong>Сумма заказа:</strong> {{ $order->price }}₽</p>
-                        <p><strong>Описание заказа:</strong> {{ $order->description }}</p>
+                        <p><strong>Дата заказа:</strong> {{ $request->created_at->format('d.m.Y') }}</p>
+                        <p><strong>Сумма заказа:</strong> {{ $request->price }}₽</p>
+                        <p><strong>Описание заказа:</strong> {{ $request->description }}</p>
                     </div>
                 </div>
 
@@ -22,7 +22,7 @@
                         <h5>Ваше предложение</h5>
                     </div>
                     <div class="card-body">
-                        <form method="POST" action="{{ route('orders.propose', $order) }}">
+                        <form method="POST" action="{{ route('orders.propose', $request) }}">
                             @csrf
 
                             <div class="mb-3">

@@ -6,6 +6,7 @@ use App\Models\Order;
 use App\Models\Response;
 use Illuminate\Http\Request;
 
+use App\Models\Request as RequestModel;
 class ProfileController extends Controller
 {
     public function update(Request $request)
@@ -14,6 +15,46 @@ class ProfileController extends Controller
         $user->update($request->only('name', 'mobile', 'email', 'location'));
         return back();
     }
+
+    public function updateStatus(Request $request)
+    {
+        $order = Order::findOrFail($request->order_id);
+        $customer = $order->customer; // Пользователь, который заказал
+        $seller = $order->seller; // Исполнитель
+
+        // Если переводим в работу, проверяем баланс
+        if ($request->status === 'IN_WORK' && in_array($order->status, ['NEW', 'WAITING_PAYMENT'])) {
+            if ($customer->balance >= $order->price) {
+                $customer->balance -= $order->price; // Снимаем деньги
+                $customer->save();
+
+                $order->status = 'IN_WORK';
+                $order->save();
+
+                return response()->json(['success' => true, 'new_balance' => $customer->balance]);
+            } else {
+                return response()->json(['success' => false, 'message' => 'Недостаточно средств на балансе'], 400);
+            }
+        }
+
+        // Если переводим в "Выполнено" - переводим деньги продавцу
+        if ($request->status === 'COMPLETED' && $order->status === 'VERIFICATION') {
+            $seller->balance += $order->price; // Начисляем деньги продавцу
+            $seller->save();
+
+            $order->status = 'COMPLETED';
+            $order->save();
+
+            return response()->json(['success' => true, 'seller_balance' => $seller->balance]);
+        }
+
+        // Если статус - просто обычное обновление, без доп. проверок
+        $order->status = $request->status;
+        $order->save();
+
+        return response()->json(['success' => true]);
+    }
+
 
     public function updateImage(Request $request)
     {
@@ -30,9 +71,11 @@ class ProfileController extends Controller
         return back();
     }
 
-    public function orders(Request $request)
+    public function requests(Request $request)
     {
-        $query = Order::query();
+        $query = RequestModel::query()->whereDoesntHave('responses', function ($query) use ($request) {
+            $query->where('user_id', $request->user()->id);
+        });
 
         // Фильтр по названию
         if ($request->has('name') && $request->get('name') !== '') {
@@ -56,17 +99,16 @@ class ProfileController extends Controller
         }
 
         // Проверяем роль пользователя и загружаем соответствующие заказы
-        $orders = $query->paginate(8);
+        $requests = $query->paginate(8);
 
-        return view('orders', compact('orders'));
+        return view('requests', compact('requests'));
     }
 
-
 // Метод для отображения конкретного заказа
-    public function showOrder(Order $order)
+    public function showRequests(RequestModel $request)
     {
         // Проверка, что заказ принадлежит текущему пользователю
-        return view('profile.showOrder', compact('order'));
+        return view('profile.showRequest', compact('request'));
     }
 
     // Метод для отображения заказов в профиле
@@ -78,17 +120,17 @@ class ProfileController extends Controller
 
     public function responses()
     {
-        $responses = Response::where('user_id', auth()->id())->with('order')->paginate(25);
+        $responses = Response::where('user_id', auth()->id())->with('request')->paginate(25);
 
         return view('profile.responses', compact('responses'));
     }
 
     public function orderPropose(Request $request, $id)
     {
-        $order = Order::findOrFail($id);
-        if (!Response::where('order_id', $order->id)->where('user_id', auth()->id())->exists()) {
+        $requestModel = RequestModel::findOrFail($id);
+        if (!Response::where('request_id', $requestModel->id)->where('user_id', auth()->id())->exists()) {
             Response::create([
-                'order_id' => $order->id,
+                'request_id' => $requestModel->id,
                 'text' => $request->get('text') ?? '',
                 'user_id' => auth()->id(),
             ]);

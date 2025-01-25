@@ -11,7 +11,7 @@ class Response extends Model
 
     protected $fillable = [
         'user_id',
-        'order_id',
+        'request_id',
         'text'
     ];
 
@@ -20,8 +20,8 @@ class Response extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function order()
+    public function request()
     {
-        return $this->belongsTo(Order::class);
+        return $this->belongsTo(Request::class);
     }
 }

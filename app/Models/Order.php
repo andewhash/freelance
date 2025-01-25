@@ -28,4 +28,9 @@ class Order extends Model
     {
         return $this->hasOne(Chat::class);
     }
+
+    public function responses()
+    {
+        return $this->hasMany(Response::class);
+    }
 }
