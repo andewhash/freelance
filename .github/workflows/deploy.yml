@@ -18,24 +18,18 @@ jobs:
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.5.3
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          ssh-private-key: ${{ secrets.SSH }}
 
-      # Шаг 3: Копирование файлов на сервер
-      - name: Copy files to server
+      # Шаг 3: Выполнение git pull на сервере
+      - name: Pull latest changes on server
         run: |
           # Настройка переменных
-          SERVER_IP="your.server.ip"
-          USERNAME="your-username"
-          REMOTE_PATH="/path/to/your/project"
+          SERVER_IP="147.45.237.94"
+          USERNAME="root"
+          REMOTE_PATH="/var/www/html/freelance"
 
-          # Копирование файлов с использованием rsync
-          rsync -avz --delete --exclude '.git' ./ $USERNAME@$SERVER_IP:$REMOTE_PATH
-
-      # Шаг 4: Перезапуск веб-сервера на сервере (если нужно)
-      - name: Restart Nginx or Apache
-        run: |
-          ssh $USERNAME@$SERVER_IP <<EOF
-            # Перезапуск Nginx (или Apache)
-            sudo systemctl restart nginx  # Для Nginx
-            # sudo systemctl restart apache2  # Для Apache
+          # Выполнение git pull на сервере
+          ssh $USERNAME@$SERVER_IP << EOF
+            cd $REMOTE_PATH || exit
+            git pull origin main
           EOF
