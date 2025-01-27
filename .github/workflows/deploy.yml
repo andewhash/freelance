@@ -18,7 +18,7 @@ jobs:
       - name: Set up SSH
         uses: webfactory/ssh-agent@v0.5.3
         with:
-          ssh-private-key: ${{ secrets.SSH }}
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       # Шаг 3: Выполнение git pull на сервере
       - name: Pull latest changes on server
