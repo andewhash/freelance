@@ -19,6 +19,10 @@ jobs:
         uses: webfactory/ssh-agent@v0.5.3
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      # Шаг 3: Добавление хоста в known_hosts
+      - name: Add SSH host to known_hosts
+        run: |
+          ssh-keyscan -H 147.45.237.94 >> ~/.ssh/known_hosts
 
       # Шаг 3: Выполнение git pull на сервере
       - name: Pull latest changes on server
