@@ -62,7 +62,7 @@
                                                 <ul class="list-group">
                                                     <li class="list-group-item border-0 ps-0 pt-0 text-sm">
                                                         <strong class="text-dark">Полное имя:</strong> &nbsp;
-                                                        <input type="text" class="form-control" name="full_name" value="{{ auth()->user()->name }}">
+                                                        <input type="text" class="form-control" name="name" value="{{ auth()->user()->name }}">
                                                     </li>
                                                     <li class="list-group-item border-0 ps-0 text-sm">
                                                         <strong class="text-dark">Телефон:</strong> &nbsp;
