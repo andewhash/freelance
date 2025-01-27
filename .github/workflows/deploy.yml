@@ -1,0 +1,41 @@
+name: Deploy to ISPmanager
+
+on:
+  push:
+    branches:
+      - main  # Укажите ветку для деплоя
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Шаг 1: Checkout кода из репозитория
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Шаг 2: Настройка SSH для подключения к серверу
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      # Шаг 3: Копирование файлов на сервер
+      - name: Copy files to server
+        run: |
+          # Настройка переменных
+          SERVER_IP="your.server.ip"
+          USERNAME="your-username"
+          REMOTE_PATH="/path/to/your/project"
+
+          # Копирование файлов с использованием rsync
+          rsync -avz --delete --exclude '.git' ./ $USERNAME@$SERVER_IP:$REMOTE_PATH
+
+      # Шаг 4: Перезапуск веб-сервера на сервере (если нужно)
+      - name: Restart Nginx or Apache
+        run: |
+          ssh $USERNAME@$SERVER_IP <<EOF
+            # Перезапуск Nginx (или Apache)
+            sudo systemctl restart nginx  # Для Nginx
+            # sudo systemctl restart apache2  # Для Apache
+          EOF
