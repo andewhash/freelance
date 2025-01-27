@@ -63,7 +63,8 @@
                                     </div>
                                 @endforeach
                             @else
-                                <p>Тут пока пусто! В <a href="{{ url('orders') }}">поиске задач</a> Вы найдете заказы</p>
+
+                                <p>Тут пока пусто! @if (auth()->user()->role == \App\Enum\User\UserRoleEnum::SELLER) В <a href="{{ url('orders') }}">поиске задач</a> Вы найдете заказы @endif</p>
                             @endif
                         </div>
                     </div>
