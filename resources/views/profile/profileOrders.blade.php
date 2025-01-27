@@ -86,7 +86,6 @@
                         <input type="hidden" id="orderId" name="order_id">
                         <p id="currentStatusText"></p>
                         <div id="statusButtons"></div>
-                        <button type="submit" id="submit-btn" class="btn btn-success w-100 mt-3">Подтвердить</button>
                     </form>
                 </div>
             </div>
