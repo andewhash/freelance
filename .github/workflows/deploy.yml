@@ -24,16 +24,15 @@ jobs:
         run: |
           ssh-keyscan -H 147.45.237.94 >> ~/.ssh/known_hosts
 
-      # Шаг 3: Выполнение git pull на сервере
-      - name: Pull latest changes on server
+      # Шаг 4: Выполнение git pull на сервере с дополнительным выводом (verbose)
+      - name: Git pull on server
         run: |
-          # Настройка переменных
           SERVER_IP="147.45.237.94"
           USERNAME="root"
           REMOTE_PATH="/var/www/html/freelance"
 
           # Выполнение git pull на сервере
-          ssh $USERNAME@$SERVER_IP << EOF
+          ssh -v $USERNAME@$SERVER_IP << EOF
             cd $REMOTE_PATH || exit
             git pull origin main
           EOF
