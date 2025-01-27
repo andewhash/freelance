@@ -63,8 +63,9 @@ class RequestController extends Controller
 
         $response->save();
 
+        $chat = Chat::where('customer_id', auth()->id())->where('request_id', $requestId)->where('seller_id', $response->user_id)->first();
 
-        if ($chat = Chat::where('customer_id', auth()->id())->where('request_id', $requestId)->where('seller_id', $response->user_id)->first()) {
+        if (!$chat) {
             $chat = Chat::create([
                 'customer_id' => auth()->id(),
                 'seller_id' => $response->user_id,
