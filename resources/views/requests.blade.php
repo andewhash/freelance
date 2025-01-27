@@ -73,7 +73,7 @@
                                 <div class="col-12 ">
                                     <div class="card mb-4">
                                         <div class="card-header">
-                                            <h5 class="card-title">Заказ #{{ $request->id }}</h5>
+                                            <h5 class="card-title">{{ $request->title }}</h5>
                                         </div>
                                         <div class="card-body">
                                             <p><strong>Сумма:</strong> <span class="text-success">{{ $request->price }} ₽</span></p>
