@@ -47,7 +47,7 @@
                             @if (auth()->user())
                             <li class="nav-item d-flex align-items-center mx-2">
                                 <a href="{{route('profile.orders')}}" role="button" class="nav-link ps-2 d-flex cursor-pointer align-items-center">
-                                    Мои работы
+                                    Мои заказы
                                 </a>
                             </li>
                             <li class="nav-item d-flex align-items-center mx-2">
@@ -116,7 +116,7 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="https://www.creative-tim.com/templates/free" target="_blank">
-                                Мои работы
+                                Мои заказы
                             </a>
                         </li>
                     </ul>
