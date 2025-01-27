@@ -14,7 +14,7 @@ class Chat extends Model
     use HasFactory;
 
     protected $fillable = [
-        'seller_id', 'customer_id', 'order_id'
+        'seller_id', 'customer_id', 'request_id'
     ];
 
     public function seller(): BelongsTo
