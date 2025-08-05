@@ -21,7 +21,8 @@ class CustomerController extends Controller
         $order = Order::create([
             'seller_id' => $request->seller_id,
             'customer_id' => auth()->id(),
-            'price' => $request->price,
+            'price' => 0,
+            'country' => $request->country,
             'commission_price' => $request->price,
             'title' => $request->title,
             'description' => $request->description,

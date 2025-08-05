@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
@@ -54,6 +55,75 @@ class MainController extends Controller
         return view('auth.register');
     }
 
+
+    public function catalogShow(User $user)
+    {
+
+        $user->load('categories', 'orders', 'chats');
+        return view('companies.show', compact('user'));
+    }
+
+    public function catalog()
+{
+    // Получаем выбранную категорию и строим хлебные крошки
+    $categoryId = request('category');
+    $breadcrumbs = [];
+    $currentCategory = null;
+    
+    if ($categoryId) {
+        $currentCategory = Category::with('ancestors')->find($categoryId);
+        if ($currentCategory) {
+            $breadcrumbs = $currentCategory->ancestors->map(function($item) {
+                return ['id' => $item->id, 'name' => $item->name];
+            })->toArray();
+            $breadcrumbs[] = ['id' => $currentCategory->id, 'name' => $currentCategory->name];
+        }
+    }
+    
+    // Получаем компании с фильтрами
+    $query = User::where('role', 'company')->with('categories');
+    
+    // Фильтр по категории
+    if ($categoryId) {
+        $query->whereHas('categories', function($q) use ($categoryId) {
+            $q->where('categories.id', $categoryId);
+        });
+    }
+    
+    // Фильтр по странам
+    if ($countries = request('country')) {
+        $query->whereIn('country', function($q) use ($countries) {
+            $q->select('name')->from('countries')->whereIn('id', $countries);
+        });
+    }
+    
+    // Фильтр по категориям
+    if ($categories = request('category')) {
+        $query->whereHas('categories', function($q) use ($categories) {
+            $q->where('categories.id', $categories);
+        });
+    }
+    
+    $companies = $query->paginate(12);
+    
+    // Получаем страны и категории для фильтров
+    $countries = ['Узбекистан'];
+    
+    $filterCategories = Category::whereHas('users')
+        ->withCount(['users' => function($q) {
+            
+        }])
+        ->get();
+    
+    return view('companies.catalog', compact(
+        'companies', 
+        'countries', 
+        'filterCategories',
+        'breadcrumbs',
+        'currentCategory'
+    ));
+}
+
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -68,6 +138,7 @@ class MainController extends Controller
         }
 
         $user = User::create([
+            'contact_email'=> $request->email,
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),

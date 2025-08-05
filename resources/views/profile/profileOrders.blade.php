@@ -8,7 +8,7 @@
             </div>
 
             <div class="card card-body mx-2 mx-md-2 mt-n6">
-                <h4>Мои Заказы</h4>
+                <h4>Мои Заявки</h4>
                 <div class="row">
                     <div class="col-md-8 col-lg-9" style="min-height: 400px;">
                         <div class="row">
@@ -64,7 +64,7 @@
                                 @endforeach
                             @else
 
-                                <p>Тут пока пусто! @if (auth()->user()->role == \App\Enum\User\UserRoleEnum::SELLER) В <a href="{{ url('orders') }}">поиске задач</a> Вы найдете заказы @endif</p>
+                                <p>Тут пока пусто!</p>
                             @endif
                         </div>
                     </div>

@@ -23,7 +23,7 @@
                             </p>
                         </div>
                     </div>
-                    <div class="col-lg-4 col-md-6 my-sm-auto ms-sm-auto me-sm-0 mx-auto mt-3">
+                    {{-- <div class="col-lg-4 col-md-6 my-sm-auto ms-sm-auto me-sm-0 mx-auto mt-3">
                         <div class="nav-wrapper position-relative end-0">
                             <ul class="nav nav-pills nav-fill p-1" role="tablist">
                                 <li class="nav-item">
@@ -40,7 +40,7 @@
                                 </li>
                             </ul>
                         </div>
-                    </div>
+                    </div> --}}
                 </div>
                 <div class="tab-content">
                     <!-- Общие вкладка -->
@@ -113,13 +113,13 @@
 
                                 <div class="col-12 mt-4">
                                     <div class="mb-5 ps-3">
-                                        <h6 class="mb-1">Заказы</h6>
-                                        <p class="text-sm">Ваши последние заказы</p>
+                                        <h6 class="mb-1">Заявки</h6>
+                                        <p class="text-sm">Ваши последние заявки</p>
 
                                         <div class="row">
                                             <div class="col ps-3">
 
-                                                У вас пока нет заказов !
+                                                У вас пока нет заявок !
                                             </div>
                                         </div>
                                     </div>

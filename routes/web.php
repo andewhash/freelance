@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\MainController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AdminController;
@@ -18,7 +19,8 @@ Route::get('/login', [\App\Http\Controllers\MainController::class, 'showLoginFor
 Route::get('/register', [\App\Http\Controllers\MainController::class, 'showRegistrationForm'])->name('register.page');
 Route::post('/login', [\App\Http\Controllers\MainController::class, 'login'])->name('login');
 Route::post('/register', [\App\Http\Controllers\MainController::class, 'register'])->name('register');
-
+Route::get('/companies', action: [MainController::class, 'catalog'])->name('companies.catalog');
+Route::get('/companies/{company}', [MainController::class, 'catalogShow'])->name('companies.show');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/logout', [\App\Http\Controllers\MainController::class, 'logout'])->name('logout');

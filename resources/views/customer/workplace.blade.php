@@ -42,6 +42,9 @@
                                                 <th>#</th>
                                                 <th>Название</th>
                                                 <th>Цена</th>
+                                                <th>Страна</th>
+                                                <th>Категория</th>
+                                                <th>Статус</th>
                                                 <th>Описание</th>
                                                 <th>Действия</th>
                                             </tr>
@@ -52,10 +55,20 @@
                                                     <td>{{ $request->id }}</td>
                                                     <td>{{ $request->title }}</td>
                                                     <td>{{ $request->price }}</td>
-                                                    <td>{{ $request->description }}</td>
+                                                    <td>{{ $request->country }}</td>
+                                                    <td>{{ $request->category }}</td>
+                                                    <td>{{ $request->status }}</td>
+                                                    <td>{{ Str::limit($request->description, 50) }}</td>
                                                     <td>
                                                         <!-- Кнопка редактирования -->
-                                                        <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editRequestModal" data-id="{{ $request->id }}" data-title="{{ $request->title }}" data-price="{{ $request->price }}" data-description="{{ $request->description }}">Редактировать</button>
+                                                        <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editRequestModal" 
+                                                            data-id="{{ $request->id }}" 
+                                                            data-title="{{ $request->title }}" 
+                                                            data-price="{{ $request->price }}" 
+                                                            data-country="{{ $request->country }}"
+                                                            data-category="{{ $request->category }}"
+                                                            data-status="{{ $request->status }}"
+                                                            data-description="{{ $request->description }}">Редактировать</button>
 
                                                         <!-- Кнопка удаления -->
                                                         <form action="{{ route('customer.requests.destroy', $request->id) }}" method="POST" style="display:inline;">
@@ -98,9 +111,31 @@
                             <label for="title" class="form-label">Название</label>
                             <input type="text" class="form-control" name="title" id="title" required>
                         </div>
-                        <div class="mb-3">
+                        {{-- <div class="mb-3">
                             <label for="price" class="form-label">Цена</label>
-                            <input type="number" class="form-control" name="price" id="price" required>
+                            <input type="number" step="0.01" class="form-control" name="price" id="price" required>
+                        </div> --}}
+                        <div class="mb-3">
+                            <label for="country" class="form-label">Страна</label>
+                            <input type="text" class="form-control" name="country" id="country" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="category" class="form-label">Категория</label>
+                            <select class="form-control" name="category" id="category" required>
+                                <option value="">Выберите категорию</option>
+                                @foreach(\App\Models\Category::get() as $category)
+                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Статус</label>
+                            <select class="form-control" name="status" id="status" required>
+                                <option value="">Выберите статус</option>
+                                @foreach(['new'] as $status)
+                                    <option value="{{ $status }}">{{ $status }}</option>
+                                @endforeach
+                            </select>
                         </div>
                         <div class="mb-3">
                             <label for="description" class="form-label">Описание</label>
@@ -132,9 +167,29 @@
                             <label for="editTitle" class="form-label">Название</label>
                             <input type="text" class="form-control" name="title" id="editTitle" required>
                         </div>
-                        <div class="mb-3">
+                        {{-- <div class="mb-3">
                             <label for="editPrice" class="form-label">Цена</label>
-                            <input type="number" class="form-control" name="price" id="editPrice" required>
+                            <input type="number" step="0.01" class="form-control" name="price" id="editPrice" required>
+                        </div> --}}
+                        <div class="mb-3">
+                            <label for="editCountry" class="form-label">Страна</label>
+                            <input type="text" class="form-control" name="country" id="editCountry" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editCategory" class="form-label">Категория</label>
+                            <select class="form-control" name="category" id="editCategory" required>
+                                @foreach(\App\Models\Category::get() as $category)
+                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editStatus" class="form-label">Статус</label>
+                            <select class="form-control" name="status" id="editStatus" required>
+                                @foreach(['new'] as $status)
+                                    <option value="{{ $status }}">{{ $status }}</option>
+                                @endforeach
+                            </select>
                         </div>
                         <div class="mb-3">
                             <label for="editDescription" class="form-label">Описание</label>
@@ -179,17 +234,21 @@
             const id = button.getAttribute('data-id');
             const title = button.getAttribute('data-title');
             const price = button.getAttribute('data-price');
+            const country = button.getAttribute('data-country');
+            const category = button.getAttribute('data-category');
+            const status = button.getAttribute('data-status');
             const description = button.getAttribute('data-description');
 
             const form = document.getElementById('editRequestForm');
             form.action = form.action.replace('request_id', id);
 
             document.getElementById('editTitle').value = title;
-            document.getElementById('editPrice').value = price;
+            document.getElementById('editCountry').value = country;
+            document.getElementById('editCategory').value = category;
+            document.getElementById('editStatus').value = status;
             document.getElementById('editDescription').value = description;
         });
 
-        // Заполнение модалки откликов
         // Заполнение модалки откликов
         const responsesModal = document.getElementById('responsesModal');
         responsesModal.addEventListener('show.bs.modal', function (event) {

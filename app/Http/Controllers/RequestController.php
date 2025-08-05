@@ -24,7 +24,7 @@ class RequestController extends Controller
 
     public function store(HttpRequest $request)
     {
-        Request::create(array_merge($request->all(), ['customer_id' => auth()->id()])); // Сохраняем заявку
+        Request::create(array_merge($request->all(), ['customer_id' => auth()->id(), 'price' => 1])); // Сохраняем заявку
         return redirect()->route('customer.requests.index');
     }
 

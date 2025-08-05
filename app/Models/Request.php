@@ -15,6 +15,9 @@ class Request extends Model
         'price',
         'commission_price',
         'title',
+        'status',
+        'category',
+        'country',
         'description',
         'count_days'
     ];

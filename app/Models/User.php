@@ -23,6 +23,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'contact_email',
         'image_url',
         'balance',
         'referral_id'
@@ -59,6 +60,11 @@ class User extends Authenticatable
         }
 
         return $this->hasMany(Chat::class, 'customer_id');
+    }
+
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class, 'user_categories');
     }
 
     public function orders()

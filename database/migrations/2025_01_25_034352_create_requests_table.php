@@ -19,6 +19,10 @@ class CreateRequestsTable extends Migration
             $table->decimal('price', 10, 2);
             $table->string('title');
             $table->text('description');
+            $table->string('country');
+            $table->string('category');
+            $table->string('status');
+            $table->unsignedBigInteger('order')->default(0);
             $table->timestamps();
         });
     }
