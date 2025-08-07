@@ -66,7 +66,7 @@
                                                     </li>
                                                     <li class="list-group-item border-0 ps-0 text-sm">
                                                         <strong class="text-dark">Телефон:</strong> &nbsp;
-                                                        <input type="text" class="form-control" name="mobile" value="{{ auth()->user()->mobile }}">
+                                                        <input type="text" class="form-control" name="phone" value="{{ auth()->user()->phone }}">
                                                     </li>
                                                     <li class="list-group-item border-0 ps-0 text-sm">
                                                         <strong class="text-dark">Email:</strong> &nbsp;
@@ -74,7 +74,7 @@
                                                     </li>
                                                     <li class="list-group-item border-0 ps-0 text-sm">
                                                         <strong class="text-dark">Локация:</strong> &nbsp;
-                                                        <input type="text" class="form-control" name="location" value="{{ auth()->user()->location }}">
+                                                        <input type="text" class="form-control" name="address" value="{{ auth()->user()->address }}">
                                                     </li>
                                                 </ul>
                                                 <div class="text-start mt-3">
