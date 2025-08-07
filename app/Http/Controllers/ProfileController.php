@@ -12,7 +12,7 @@ class ProfileController extends Controller
     public function update(Request $request)
     {
         $user = auth()->user();
-        $user->update($request->only('name', 'mobile', 'email', 'location'));
+        $user->update($request->only('name', 'phone', 'email', 'address'));
         return back();
     }
 

@@ -26,7 +26,9 @@ class User extends Authenticatable
         'contact_email',
         'image_url',
         'balance',
-        'referral_id'
+        'referral_id',
+        'address',
+        'phone'
     ];
 
     /**
