@@ -20,6 +20,16 @@ class Category extends Model
         return $this->belongsToMany(User::class, 'user_categories');
     }
 
+    public function requests()
+    {
+        return $this->hasMany(Request::class, 'category');
+    }
+
+    public function responses()
+    {
+        return $this->hasMany(Response::class, 'category');
+    }
+
 
     // Родительская категория
     public function parent(): BelongsTo

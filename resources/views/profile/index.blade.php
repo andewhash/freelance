@@ -111,7 +111,7 @@
 
 
 
-                                <div class="col-12 mt-4">
+                                {{-- <div class="col-12 mt-4">
                                     <div class="mb-5 ps-3">
                                         <h6 class="mb-1">Заявки</h6>
                                         <p class="text-sm">Ваши последние заявки</p>
@@ -123,7 +123,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                </div> --}}
                             </div>
                         </div>
                     </div>

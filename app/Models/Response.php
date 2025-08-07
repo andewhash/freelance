@@ -11,9 +11,18 @@ class Response extends Model
 
     protected $fillable = [
         'user_id',
-        'request_id',
-        'text'
+        'text',
+        'title',
+        'count',
+        'category',
+        'is_exists',
+        'image_path',
     ];
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class, 'category');
+    }
 
     public function user()
     {

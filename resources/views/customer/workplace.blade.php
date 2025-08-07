@@ -111,10 +111,7 @@
                             <label for="title" class="form-label">Название</label>
                             <input type="text" class="form-control" name="title" id="title" required>
                         </div>
-                        {{-- <div class="mb-3">
-                            <label for="price" class="form-label">Цена</label>
-                            <input type="number" step="0.01" class="form-control" name="price" id="price" required>
-                        </div> --}}
+                      
                         <div class="mb-3">
                             <label for="country" class="form-label">Страна</label>
                             <input type="text" class="form-control" name="country" id="country" required>
@@ -125,15 +122,6 @@
                                 <option value="">Выберите категорию</option>
                                 @foreach(\App\Models\Category::get() as $category)
                                     <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="status" class="form-label">Статус</label>
-                            <select class="form-control" name="status" id="status" required>
-                                <option value="">Выберите статус</option>
-                                @foreach(['new'] as $status)
-                                    <option value="{{ $status }}">{{ $status }}</option>
                                 @endforeach
                             </select>
                         </div>

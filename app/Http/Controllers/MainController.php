@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use Hash;
+use App\Models\Request as ModelRequest;
+use App\Models\Response;
+
 class MainController extends Controller
 {
     public function index()
@@ -148,5 +151,99 @@ class MainController extends Controller
         Auth::login($user);
 
         return redirect()->route('profile'); // Переход на страницу после успешной регистрации
+    }
+
+
+        // Для Заявок
+    public function requestsCatalog()
+    {
+        // Аналогично companies.catalog, но для модели Order
+        $categoryId = request('category');
+        $breadcrumbs = [];
+        $currentCategory = null;
+        
+        if ($categoryId) {
+            $currentCategory = Category::with('ancestors')->find($categoryId);
+            if ($currentCategory) {
+                $breadcrumbs = $currentCategory->ancestors->map(function($item) {
+                    return ['id' => $item->id, 'name' => $item->name];
+                })->toArray();
+                $breadcrumbs[] = ['id' => $currentCategory->id, 'name' => $currentCategory->name];
+            }
+        }
+        
+        $query = ModelRequest::query()->with('categoryLink');
+        
+        // Фильтры
+        if ($categoryId) {
+            $query->where('category', $categoryId);
+        }
+        
+        if ($countries = request('country')) {
+            $query->whereIn('country', $countries);
+        }
+        
+        $orders = $query->paginate(12);
+        
+        $countries = ['Узбекистан']; // Или из базы данных
+        $filterCategories = Category::whereHas('requests')->get();
+        
+        return view('requests.catalog', compact(
+            'orders', 
+            'countries', 
+            'filterCategories',
+            'breadcrumbs',
+            'currentCategory'
+        ));
+    }
+
+    public function requestsShow(ModelRequest $order)
+    {
+        $order->load('customer');
+        return view('requests.show', compact('order'));
+    }
+
+    // Для Объявлений
+    public function responsesCatalog()
+    {
+        $categoryId = request('category');
+        $breadcrumbs = [];
+        $currentCategory = null;
+        
+        if ($categoryId) {
+            $currentCategory = Category::with('ancestors')->find($categoryId);
+            if ($currentCategory) {
+                $breadcrumbs = $currentCategory->ancestors->map(function($item) {
+                    return ['id' => $item->id, 'name' => $item->name];
+                })->toArray();
+                $breadcrumbs[] = ['id' => $currentCategory->id, 'name' => $currentCategory->name];
+            }
+        }
+        
+        $query = Response::query()->with('user', 'category');
+        
+        // Фильтры
+        if ($categoryId) {
+            $query->where('category', $categoryId);
+        }
+        
+        $responses = $query->paginate(12);
+        
+        $countries = ['Узбекистан']; // Или из базы данных
+        $filterCategories = Category::whereHas('responses')->get();
+        
+        return view('responses.catalog', compact(
+            'responses', 
+            'countries', 
+            'filterCategories',
+            'breadcrumbs',
+            'currentCategory'
+        ));
+    }
+
+    public function responsesShow(Response $response)
+    {
+        $response->load('user');
+        return view('responses.show', compact('response'));
     }
 }

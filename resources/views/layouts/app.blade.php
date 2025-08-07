@@ -202,11 +202,11 @@
                         </div>
                     </div>
 
-                    <a class="ms-sm-3" href="">
+                    <a class="ms-sm-3" href="{{route('responses.catalog')}}">
                         Предложения
                     </a>
 
-                    <a class="ms-sm-3" href="">
+                    <a class="ms-sm-3" href="{{route('requests.catalog')}}">
                         Заявки
                     </a>
 
@@ -224,13 +224,13 @@
                             @if (auth()->user() && auth()->user()->role == \App\Enum\User\UserRoleEnum::CUSTOMER)
                             <li class="nav-item d-flex align-items-center mx-2">
                                 <a href="{{route('customer.requests.index')}}" role="button" class="nav-link ps-2 d-flex cursor-pointer align-items-center">
-                                    Кабинет заказчика
+                                    Кабинет покупателя
                                 </a>
                             </li>
                             @endif
                             @if (auth()->user() && auth()->user()->role != \App\Enum\User\UserRoleEnum::CUSTOMER)
                             <li class="nav-item d-flex align-items-center mx-2">
-                                <a href="{{route('profile.orders')}}" role="button" class="nav-link ps-2 d-flex cursor-pointer align-items-center">
+                                <a href="{{route('seller.responses.index')}}" role="button" class="nav-link ps-2 d-flex cursor-pointer align-items-center">
                                     Кабинет поставщика
                                 </a>
                             </li>

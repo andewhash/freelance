@@ -22,9 +22,19 @@ class Request extends Model
         'count_days'
     ];
 
+    public function categoryLink()
+    {
+        return $this->belongsTo(Category::class, 'category');
+    }
+
     public function responses()
     {
         return $this->hasMany(Response::class);
+    }
+
+    public function customer()
+    {
+        return $this->belongsTo(User::class, 'customer_id');
     }
 
 }
