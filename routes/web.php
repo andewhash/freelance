@@ -21,6 +21,10 @@ Route::get('/login', [\App\Http\Controllers\MainController::class, 'showLoginFor
 Route::get('/register', [\App\Http\Controllers\MainController::class, 'showRegistrationForm'])->name('register.page');
 Route::post('/login', [\App\Http\Controllers\MainController::class, 'login'])->name('login');
 Route::post('/register', [\App\Http\Controllers\MainController::class, 'register'])->name('register');
+Route::get('/verification', [\App\Http\Controllers\MainController::class, 'showVerificationForm'])->name('verification');
+Route::post('/verify-email', [\App\Http\Controllers\MainController::class, 'verifyEmail'])->name('verify.email');
+Route::post('/verify-phone', [\App\Http\Controllers\MainController::class, 'verifyPhone'])->name('verify.phone');
+
 
 // Main Pages
 Route::get('/companies', action: [MainController::class, 'catalog'])->name('companies.catalog');
@@ -35,15 +39,17 @@ Route::get('/responses', [MainController::class, 'responsesCatalog'])->name('res
 Route::get('/responses/{response}', [MainController::class, 'responsesShow'])->name('responses.show');
 
 // Auth Pages
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     // Auth Logout
     Route::get('/logout', [\App\Http\Controllers\MainController::class, 'logout'])->name('logout');
     
     //  Profile
-    Route::get('/profile', [\App\Http\Controllers\MainController::class, 'profile'])->name('profile');
-    Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
-    Route::post('/profile/update-image', [ProfileController::class, 'updateImage'])->name('profile.updateImage');
-
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
+    Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/company', [ProfileController::class, 'updateCompany'])->name('profile.updateCompany');
+    Route::post('/profile/image', [ProfileController::class, 'updateImage'])->name('profile.updateImage');
+    Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.updatePassword');
+    
     // Requests V2
     // Route::get('/requests', [ProfileController::class, 'requests'])->name('orders');
     // Route::get('/requests/{request}', [ProfileController::class, 'showRequests'])->name('orders.show');
@@ -75,7 +81,11 @@ Route::middleware(['auth'])->group(function () {
     // Customer
     Route::group(['prefix' => 'seller/', 'as' => 'seller.'], function () {
         // Requests create update
-        Route::resource('responses', ResponseController::class)->except(['show']);
+        Route::resource('responses', \App\Http\Controllers\Seller\ResponseController::class);
+        Route::delete('responses/{response}/images/{image}', [\App\Http\Controllers\Seller\ResponseController::class, 'destroyImage'])
+            ->name('seller.responses.images.destroy');
+        Route::get('responses/{response}/images', [\App\Http\Controllers\Seller\ResponseController::class, 'getImages'])
+            ->name('seller.responses.images');
         // Orders V2
         // Route::get('/orders/create', [\App\Http\Controllers\CustomerController::class, 'createOrder'])->name('orders.create');
     });

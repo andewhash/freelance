@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Response extends Model
 {
     use HasFactory;
@@ -22,6 +22,21 @@ class Response extends Model
     public function category()
     {
         return $this->belongsTo(Category::class, 'category');
+    }
+
+    public function countries()
+    {
+        return $this->belongsToMany(Country::class, 'response_countries');
+    }
+
+    public function categories(): BelongsToMany
+    {
+        return $this->belongsToMany(Category::class, 'response_categories');
+    }
+
+    public function images()
+    {
+        return $this->belongsToMany(File::class, 'response_images');
     }
 
     public function user()

@@ -11,17 +11,15 @@ use App\Models\User;
 use Hash;
 use App\Models\Request as ModelRequest;
 use App\Models\Response;
+use App\Models\Country;
+use App\Mail\RegistrationEmail;
+use Illuminate\Support\Facades\Mail;
 
 class MainController extends Controller
 {
     public function index()
     {
         return view('index');
-    }
-
-    public function profile()
-    {
-        return view ('profile.index');
     }
 
     public function showLoginForm()
@@ -132,6 +130,7 @@ class MainController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
+            'phone' => 'required|string|unique:users',
             'password' => 'required|string|min:6|confirmed',
             'role' => 'required|in:CUSTOMER,SELLER',
         ]);
@@ -140,104 +139,181 @@ class MainController extends Controller
             return back()->withErrors($validator)->withInput();
         }
 
+        // Генерация кодов верификации
+        $emailCode = rand(100000, 999999);
+        $phoneCode = rand(100000, 999999);
+
         $user = User::create([
-            'contact_email'=> $request->email,
+            'contact_email' => $request->email,
             'name' => $request->name,
             'email' => $request->email,
+            'phone' => $request->phone,
             'password' => Hash::make($request->password),
-            'role' => $request->role, // Сохранение выбранной роли
+            'role' => $request->role,
+            'email_verification_code' => $emailCode,
+            'phone_verification_code' => $phoneCode,
         ]);
 
-        Auth::login($user);
+        // Отправка кода на email
+        Mail::to($user->email)->send(new RegistrationEmail($user));
 
-        return redirect()->route('profile'); // Переход на страницу после успешной регистрации
+        // Здесь должен быть код для отправки SMS с $phoneCode
+        // Например через сервис sms.ru или другой SMS-шлюз
+
+        // Сохраняем ID пользователя в сессии для верификации
+        session(['verifying_user_id' => $user->id]);
+        Auth::login($user);
+        return redirect()->route('verification');
     }
 
+    public function showVerificationForm()
+    {
+        if (!session()->has('verifying_user_id') && !auth()->user()) {
+            return redirect()->route('register');
+        }
+        return view('auth.verification');
+    }
 
-        // Для Заявок
+    public function verifyEmail(Request $request)
+    {
+        $user = auth()->user();
+        // $request->validate(['code' => 'required|digits:6']);
+
+        // $user = User::find(session('verifying_user_id'));
+
+        if (!$user) {
+            $user = auth()->user();
+        } 
+
+        if ($user->email_verification_code == $request->code) {
+            $user->update([
+                'email_verified_at' => now(),
+                'email_verification_code' => null
+            ]);
+
+            return redirect()->route('verification');
+        }
+
+        return back()->withErrors(['code' => 'Неверный код подтверждения']);
+    }
+
+    public function verifyPhone(Request $request)
+    {
+        $request->validate(['code' => 'required|digits:6']);
+
+        $user = User::find(session('verifying_user_id'));
+
+        if ($user->phone_verification_code == $request->code) {
+            $user->update([
+                'phone_verified_at' => now(),
+                'phone_verification_code' => null
+            ]);
+
+            Auth::login($user);
+            session()->forget('verifying_user_id');
+
+            return redirect()->route('profile');
+        }
+
+        return back()->withErrors(['code' => 'Неверный код подтверждения']);
+    }
+
     public function requestsCatalog()
     {
-        // Аналогично companies.catalog, но для модели Order
-        $categoryId = request('category');
+        $categoryIds = request('categories', []);
+        $countryIds = request('countries', []);
+        $searchQuery = request('search');
         $breadcrumbs = [];
-        $currentCategory = null;
         
-        if ($categoryId) {
-            $currentCategory = Category::with('ancestors')->find($categoryId);
-            if ($currentCategory) {
-                $breadcrumbs = $currentCategory->ancestors->map(function($item) {
-                    return ['id' => $item->id, 'name' => $item->name];
-                })->toArray();
-                $breadcrumbs[] = ['id' => $currentCategory->id, 'name' => $currentCategory->name];
-            }
+        $query = ModelRequest::query()->with('categories', 'countries');
+        
+        // Фильтр по категориям (мультиселект)
+        if (!empty($categoryIds)) {
+            $query->whereHas('categories', function($q) use ($categoryIds) {
+                $q->whereIn('categories.id', $categoryIds);
+            });
         }
         
-        $query = ModelRequest::query()->with('categoryLink');
-        
-        // Фильтры
-        if ($categoryId) {
-            $query->where('category', $categoryId);
+        // Фильтр по странам (через связь many-to-many)
+        if (!empty($countryIds)) {
+            $query->whereHas('countries', function($q) use ($countryIds) {
+                $q->whereIn('countries.id', $countryIds);
+            });
         }
         
-        if ($countries = request('country')) {
-            $query->whereIn('country', $countries);
+        // Поиск по тексту или заголовку
+        if ($searchQuery) {
+            $query->where(function($q) use ($searchQuery) {
+                $q->where('description', 'like', "%{$searchQuery}%")
+                  ->orWhere('title', 'like', "%{$searchQuery}%");
+            });
         }
         
-        $orders = $query->paginate(12);
+        $requests = $query->paginate(12);
         
-        $countries = ['Узбекистан']; // Или из базы данных
-        $filterCategories = Category::whereHas('requests')->get();
+        $allCountries = Country::get(); // Или ваш источник данных по странам
+        $allCategories = Category::get();
         
         return view('requests.catalog', compact(
-            'orders', 
-            'countries', 
-            'filterCategories',
+            'requests', 
+            'allCountries', 
+            'allCategories',
             'breadcrumbs',
-            'currentCategory'
+            'searchQuery',
+            'categoryIds',
+            'countryIds'
         ));
     }
-
     public function requestsShow(ModelRequest $order)
     {
         $order->load('customer');
         return view('requests.show', compact('order'));
     }
 
-    // Для Объявлений
     public function responsesCatalog()
     {
-        $categoryId = request('category');
+        $categoryIds = request('categories', []);
+        $countryIds = request('countries', []);
+        $searchQuery = request('search');
         $breadcrumbs = [];
-        $currentCategory = null;
         
-        if ($categoryId) {
-            $currentCategory = Category::with('ancestors')->find($categoryId);
-            if ($currentCategory) {
-                $breadcrumbs = $currentCategory->ancestors->map(function($item) {
-                    return ['id' => $item->id, 'name' => $item->name];
-                })->toArray();
-                $breadcrumbs[] = ['id' => $currentCategory->id, 'name' => $currentCategory->name];
-            }
+        $query = Response::query()->with('user', 'category', 'countries', 'images');
+        
+        // Фильтр по категориям (мультиселект)
+        if (!empty($categoryIds)) {
+            $query->whereHas('categories', function($q) use ($categoryIds) {
+                $q->whereIn('categories.id', $categoryIds);
+            });
         }
         
-        $query = Response::query()->with('user', 'category');
+        // Фильтр по странам (через связь many-to-many)
+        if (!empty($countryIds)) {
+            $query->whereHas('countries', function($q) use ($countryIds) {
+                $q->whereIn('countries.id', $countryIds);
+            });
+        }
         
-        // Фильтры
-        if ($categoryId) {
-            $query->where('category', $categoryId);
+        // Поиск по тексту или заголовку
+        if ($searchQuery) {
+            $query->where(function($q) use ($searchQuery) {
+                $q->where('text', 'like', "%{$searchQuery}%")
+                ->orWhere('title', 'like', "%{$searchQuery}%");
+            });
         }
         
         $responses = $query->paginate(12);
         
-        $countries = ['Узбекистан']; // Или из базы данных
-        $filterCategories = Category::whereHas('responses')->get();
+        $allCountries = Country::get();
+        $allCategories = Category::get();
         
         return view('responses.catalog', compact(
             'responses', 
-            'countries', 
-            'filterCategories',
+            'allCountries', 
+            'allCategories',
             'breadcrumbs',
-            'currentCategory'
+            'searchQuery',
+            'categoryIds',
+            'countryIds'
         ));
     }
 

@@ -20,15 +20,31 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
-        'email',
-        'password',
         'role',
-        'contact_email',
-        'image_url',
-        'balance',
-        'referral_id',
+        'last_name',
+        'email',
+        'phone',
+        'telegram',
+        'whatsapp',
         'address',
-        'phone'
+        'country',
+        'region',
+        'email_verified_at',
+        'phone_verified_at',
+        'phone_verification_code',
+        'email_verification_code',
+        'city',
+        'brand',
+        'mark',
+        'description',
+        'business_type',
+        'exported',
+        'count_employers',
+        'year',
+        'contact_email',
+        'site',
+        'image_url',
+        'password'
     ];
 
     /**

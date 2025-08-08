@@ -12,7 +12,8 @@
         Textile Server
     </title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
-
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
     <!--     Fonts and icons     -->
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,900" />
     <!-- Nucleo Icons -->
@@ -318,6 +319,16 @@
     </div>
 </footer>
 
+<!-- Подключаем jQuery перед Select2 -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<!-- Для русского языка (опционально) -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/ru.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <!--   Core JS Files   -->
 <script src="/assets/js/core/popper.min.js" type="text/javascript"></script>
 <script src="/assets/js/core/bootstrap.min.js" type="text/javascript"></script>
@@ -325,6 +336,24 @@
 <script src="/assets/js/plugins/countup.min.js"></script>
 <script src="/assets/js/material-dashboard.min.js?v=3.2.0" type="text/javascript"></script>
 <script type="text/javascript">
+  $(document).ready(function() {
+    $('.select2').select2({
+            placeholder: "Выберите значения",
+            allowClear: true,
+            width: 'resolve', // Автоматически подстраивается под родительский элемент
+            closeOnSelect: false, // Не закрывать после выбора
+            language: "ru", // Русский язык
+            dropdownAutoWidth: true,
+            theme: "bootstrap-5" // Используем тему, совместимую с Bootstrap 5
+        });
+    });
+
+    
+    // Авто-отправка формы при изменении фильтров
+    $('.select2-multiple').change(function() {
+        $('#filter-form').submit();
+    });
+
     if (document.getElementById('stats1')) {
         const countUp = new CountUp('stats1', document.getElementById("stats1").getAttribute("countTo"));
         if (!countUp.error) {

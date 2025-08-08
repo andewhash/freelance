@@ -32,6 +32,18 @@
                             </div>
                         </div>
                         <div class="card-body">
+
+                            @if($errors->any())
+                                <div class="alert alert-danger text-white">
+                                    <ul class="mb-0">
+                                        @foreach($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
+
+                            
                             <form action="{{ route('register') }}" method="post" class="text-start">
                                 @csrf
 
@@ -49,6 +61,15 @@
                                     <label class="form-label">Почта</label>
                                     <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}">
                                     @error('email')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <!-- Почта -->
+                                <div class="input-group input-group-outline my-3">
+                                    <label class="form-label">Телефон</label>
+                                    <input type="phone" name="phone" class="form-control @error('phone') is-invalid @enderror" value="{{ old('phone') }}">
+                                    @error('phone')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>

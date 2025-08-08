@@ -5,10 +5,20 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Category extends Model
 {
     use HasFactory;
+
+    public function requests(): BelongsToMany
+    {
+        return $this->belongsToMany(Request::class, 'request_categories');
+    }
+
+    public function responses(): BelongsToMany
+    {
+        return $this->belongsToMany(Response::class, 'response_categories');
+    }
 
     public function children()
     {
@@ -18,16 +28,6 @@ class Category extends Model
     public function users()
     {
         return $this->belongsToMany(User::class, 'user_categories');
-    }
-
-    public function requests()
-    {
-        return $this->hasMany(Request::class, 'category');
-    }
-
-    public function responses()
-    {
-        return $this->hasMany(Response::class, 'category');
     }
 
 

@@ -5,13 +5,19 @@ namespace App\Http\Controllers\Seller;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Response;
+use App\Models\Country;
+use App\Models\Category;
+use App\Models\File;
+use App\Models\ResponseCountry;
+use App\Models\ResponseCategory;
+use App\Models\ResponseImage;
 use Illuminate\Support\Facades\Storage;
 
 class ResponseController extends Controller
 {
     public function index()
     {
-        $responses = Response::with(['user', 'category', 'request'])
+        $responses = Response::with(['user', 'categories', 'countries', 'request', 'images'])
             ->where('user_id', auth()->user()->id)
             ->orderByDesc('id')
             ->get()
@@ -27,9 +33,13 @@ class ResponseController extends Controller
             'text' => 'required|string',
             'title' => 'required|string|max:255',
             'count' => 'nullable|integer',
-            'category' => 'required|exists:categories,id',
+            'categories' => 'required|array',
+            'categories.*' => 'exists:categories,id',
+            'countries' => 'required|array',
+            'countries.*' => 'exists:countries,id',
             'is_exists' => 'nullable|boolean',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'images' => 'nullable|array',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'request_id' => 'nullable|exists:requests,id',
         ]);
 
@@ -38,22 +48,41 @@ class ResponseController extends Controller
             'text' => $validatedData['text'],
             'title' => $validatedData['title'],
             'count' => $validatedData['count'] ?? 0,
-            'category' => $validatedData['category'],
             'is_exists' => $validatedData['is_exists'] ?? false,
             'request_id' => $validatedData['request_id'] ?? null,
         ];
 
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('public/responses');
-            $responseData['image_path'] = Storage::url($imagePath);
+        // Создаем отклик
+        $response = Response::create($responseData);
+
+        // Прикрепляем категории
+        $response->categories()->sync($validatedData['categories']);
+
+        // Прикрепляем страны
+        $response->countries()->sync($validatedData['countries']);
+
+        // Сохраняем изображения
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $path = $image->store('public/responses');
+                
+                $file = File::create([
+                    'name' => $image->getClientOriginalName(),
+                    'path' => Storage::url($path),
+                    'mime_type' => $image->getMimeType(),
+                    'size' => $image->getSize(),
+                ]);
+
+                ResponseImage::create([
+                    'response_id' => $response->id,
+                    'file_id' => $file->id,
+                ]);
+            }
         }
 
-        Response::create($responseData);
-
-        return redirect()->back()->with('success', 'Response created successfully.');
+        return redirect()->back()->with('success', 'Объявление успешно создано.');
     }
 
- 
     public function update(Request $request, $id)
     {
         $response = Response::findOrFail($id);
@@ -62,9 +91,13 @@ class ResponseController extends Controller
             'text' => 'required|string',
             'title' => 'required|string|max:255',
             'count' => 'nullable|integer',
-            'category' => 'required|exists:categories,id',
+            'categories' => 'required|array',
+            'categories.*' => 'exists:categories,id',
+            'countries' => 'required|array',
+            'countries.*' => 'exists:countries,id',
             'is_exists' => 'nullable|boolean',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'images' => 'nullable|array',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'request_id' => 'nullable|exists:requests,id',
         ]);
 
@@ -72,37 +105,83 @@ class ResponseController extends Controller
             'text' => $validatedData['text'],
             'title' => $validatedData['title'],
             'count' => $validatedData['count'] ?? 0,
-            'category' => $validatedData['category'],
             'is_exists' => $validatedData['is_exists'] ?? false,
             'request_id' => $validatedData['request_id'] ?? null,
         ];
 
-        if ($request->hasFile('image')) {
-            if ($response->image_path) {
-                $oldImagePath = str_replace('/storage', 'public', $response->image_path);
-                Storage::delete($oldImagePath);
-            }
+        // Обновляем категории
+        $response->categories()->sync($validatedData['categories']);
 
-            $imagePath = $request->file('image')->store('public/responses');
-            $updateData['image_path'] = Storage::url($imagePath);
+        // Обновляем страны
+        $response->countries()->sync($validatedData['countries']);
+
+        // Добавляем новые изображения
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $path = $image->store('public/responses');
+                
+                $file = File::create([
+                    'name' => $image->getClientOriginalName(),
+                    'path' => Storage::url($path),
+                    'mime_type' => $image->getMimeType(),
+                    'size' => $image->getSize(),
+                ]);
+
+                ResponseImage::create([
+                    'response_id' => $response->id,
+                    'file_id' => $file->id,
+                ]);
+            }
         }
 
         $response->update($updateData);
 
-        return redirect()->back()->with('success', 'Response updated successfully.');
+        return redirect()->back()->with('success', 'Объявление успешно обновлено.');
+    }
+
+    public function destroyImage($responseId, $imageId)
+    {
+        $image = ResponseImage::where('response_id', $responseId)
+            ->where('file_id', $imageId)
+            ->firstOrFail();
+
+        // Удаляем файл из хранилища
+        $path = str_replace('/storage', 'public', $image->file->path);
+        Storage::delete($path);
+
+        // Удаляем записи из БД
+        $image->delete();
+        $image->file()->delete();
+
+        return redirect()->back()->with('success', 'Изображение удалено.');
+    }
+
+    public function getImages($id)
+    {
+        $response = Response::with('images.file')->findOrFail($id);
+        $images = $response->images->map(function($image) {
+            return [
+                'id' => $image->file_id,
+                'path' => $image->file->path
+            ];
+        });
+        
+        return response()->json($images);
     }
 
     public function destroy($id)
     {
         $response = Response::findOrFail($id);
 
-        if ($response->image_path) {
-            $imagePath = str_replace('/storage', 'public', $response->image_path);
-            Storage::delete($imagePath);
+        // Удаляем изображения
+        foreach ($response->images as $image) {
+            $path = str_replace('/storage', 'public', $image->file->path);
+            Storage::delete($path);
+            $image->file()->delete();
         }
 
         $response->delete();
 
-        return redirect()->back()->with('success', 'Response deleted successfully.');
+        return redirect()->back()->with('success', 'Объявление удалено.');
     }
 }

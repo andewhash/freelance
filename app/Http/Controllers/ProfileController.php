@@ -5,15 +5,86 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\Response;
 use Illuminate\Http\Request;
-
+use Hash;
 use App\Models\Request as RequestModel;
 class ProfileController extends Controller
 {
+    public function index()
+    {
+        return view ('profile.index');
+    }
+
     public function update(Request $request)
     {
         $user = auth()->user();
-        $user->update($request->only('name', 'phone', 'email', 'address'));
-        return back();
+        
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'last_name' => 'nullable|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,'.$user->id,
+            'phone' => 'nullable|string|max:20',
+            'telegram' => 'nullable|string|max:255',
+            'whatsapp' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:255',
+            'country' => 'nullable|string|max:100',
+            'region' => 'nullable|string|max:100',
+            'city' => 'nullable|string|max:100',
+            'contact_email' => 'nullable|email|max:255',
+            'site' => 'nullable|url|max:255',
+        ]);
+        
+        $user->update($validated);
+        
+        return back()->with('success', 'Профиль успешно обновлен');
+    }
+
+    public function updateCompany(Request $request)
+    {
+        $user = auth()->user();
+        
+        $validated = $request->validate([
+            'brand' => 'required|string|max:255',
+            'mark' => 'nullable|string|max:255',
+            'description' => 'required|string',
+            'business_type' => 'required|string|in:manufacturer,distributor,wholesaler',
+            'exported' => 'required|boolean',
+            'count_employers' => 'nullable|string|max:50',
+            'year' => 'nullable|string|max:4',
+        ]);
+        
+        $user->update($validated);
+        
+        return back()->with('success', 'Информация о компании обновлена');
+    }
+
+    public function updateImage(Request $request)
+    {
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+        
+        $path = $request->file('image')->store('public/avatars');
+        auth()->user()->update(['image_url' => str_replace('public/', '', $path)]);
+        
+        return back()->with('success', 'Фотография профиля обновлена');
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required',
+            'new_password' => 'required|string|min:8|confirmed',
+        ]);
+        
+        $user = auth()->user();
+        
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->withErrors(['current_password' => 'Текущий пароль неверен']);
+        }
+        
+        $user->update(['password' => Hash::make($request->new_password)]);
+        
+        return back()->with('success', 'Пароль успешно изменен');
     }
 
     public function updateStatus(Request $request)
@@ -55,21 +126,6 @@ class ProfileController extends Controller
         return response()->json(['success' => true]);
     }
 
-
-    public function updateImage(Request $request)
-    {
-        $request->validate([
-            'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        ]);
-
-        $user = auth()->user();
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('avatars', 'public');
-            $user->update(['image_url' => $imagePath]);
-        }
-
-        return back();
-    }
 
     public function requests(Request $request)
     {
