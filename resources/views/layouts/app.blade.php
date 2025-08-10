@@ -26,6 +26,17 @@
     <!-- CSS Files -->
     <link id="pagestyle" href="/assets/css/material-dashboard.css?v=3.2.0" rel="stylesheet" />
     <style>
+        .input-group.is-focused .form-control {
+            background-image: linear-gradient(0deg, #f69459 2px, rgba(156, 39, 176, 0) 0), linear-gradient(0deg, #d2d2d2 1px, hsla(0, 0%, 82%, 0) 0) !important;
+        }
+        .input-group.is-focused label {
+            color: #f69459 !important;
+        }
+        .input-group.input-group-dynamic .form-control, .input-group.input-group-dynamic .form-control:focus, .input-group.input-group-static .form-control, .input-group.input-group-static .form-control:focus {
+            background-image: none;
+        }
+    </style>
+    <style>
         /* Стили для выпадающего меню категорий */
         .dropdown-menu-categories {
             display: none;
@@ -147,6 +158,12 @@
             border-color: #f69459 !important;
 
         }
+
+        .btn-another-primary {
+            border-color: #f69459 !important;
+            color: #f69459 !important;
+            border: 1px solid !important;
+        }
         .alert-warning {
             color:  white !important;
             background-color: #f69459 !important;
@@ -160,6 +177,17 @@
         .primary-text-color {
             color: #f69459 !important;
             
+        }
+
+        .an-color {
+            color: black !important;
+        }
+
+        .input-group .catalog-search-input {
+            height: 36px;
+            box-shadow: 0 2px 2px 0 rgb(183 183 183 / 10%), 0 3px 1px -2px rgb(223 223 223 / 18%), 0 1px 5px 0 rgb(201 201 201 / 15%);
+            border-top-right-radius: 0px !important;
+            border-bottom-right-radius: 0px !important;
         }
     </style>
 </head>
@@ -177,8 +205,8 @@
 
                     <!-- Добавленная кнопка Каталог компаний -->
                     <div class="nav-item nav-item-catalog mx-2">
-                        <a class="nav-link nav-link-catalog" id="catalogDropdown">
-                            Каталог
+                        <a class="" id="catalogDropdown">
+                            Компании
                         </a>
                         <div class="dropdown-menu-categories">
                             <!-- Здесь будут динамически загружаться категории -->
@@ -244,7 +272,7 @@
                             @if (auth()->check())
                                 <li class="nav-item d-flex align-items-center mx-2">
                                     <span class="badge bg-primary" style="font-size: 1rem;">
-                                        Баланс: {{ number_format(auth()->user()->balance, 2) }} ₽
+                                         {{ number_format(auth()->user()->balance, 2) }} ₽
                                     </span>
                                 </li>
                                 <li class="nav-item d-flex align-items-center mx-2">
@@ -274,61 +302,161 @@
 
 @yield('content')
 
-
 <footer class="footer pt-5 mt-5">
     <div class="container">
-        <div class=" row">
+        <div class="row">
+            <!-- Логотип и описание -->
             <div class="col-md-3 mb-4 ms-auto">
                 <div>
                     <a href="/">
                         <img src="/assets/img/logo-ct-dark.png" class="mb-3 footer-logo" alt="main_logo">
                     </a>
-                    <h6 class="font-weight-bolder mb-4 main-color">Textile Server</h6>
+                    <h6 class="font-weight-bolder mb-4 an-color">Textile Server</h6>
+                    <p class="text-sm an-color">Платформа для текстильной промышленности. Связываем производителей, поставщиков и покупателей.</p>
+                    <div class="mt-3">
+                        <a href="#" class="me-2"><i class="fab fa-telegram fa-lg"></i></a>
+                        <a href="#" class="me-2"><i class="fab fa-whatsapp fa-lg"></i></a>
+                        <a href="#" class="me-2"><i class="fab fa-vk fa-lg"></i></a>
+                    </div>
                 </div>
             </div>
+
+            <!-- Каталог -->
             <div class="col-md-2 col-sm-6 col-6 mb-4">
                 <div>
-                    <h6 class="text-sm main-color">Компания</h6>
+                    <h6 class="text-sm an-color">Каталог</h6>
                     <ul class="flex-column ms-n3 nav">
                         <li class="nav-item">
-                            <a class="nav-link main-color" href="https://www.creative-tim.com/presentation" target="_blank">
-                                Поиск задач
+                            <a class="nav-link an-color" href="/companies" target="_blank">
+                                Компании
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link main-color" href="https://www.creative-tim.com/templates/free" target="_blank">
-                                Мои заказы
+                            <a class="nav-link an-color" href="/products" target="_blank">
+                                Товары
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link an-color" href="/responses" target="_blank">
+                                Предложения
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link an-color" href="/requests" target="_blank">
+                                Заявки
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link an-color" href="/categories" target="_blank">
+                                Категории
                             </a>
                         </li>
                     </ul>
                 </div>
             </div>
+
+            <!-- Личный кабинет -->
             <div class="col-md-2 col-sm-6 col-6 mb-4">
                 <div>
-                    <h6 class="text-sm main-color">Личный кабинет</h6>
+                    <h6 class="text-sm an-color">Аккаунт</h6>
                     <ul class="flex-column ms-n3 nav">
                         <li class="nav-item">
-                            <a class="nav-link main-color" href="https://iradesign.io/" target="_blank">
-                                Настройки
+                            <a class="nav-link an-color" href="/login" target="_blank">
+                                Вход
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link main-color" href="https://www.creative-tim.com/bits" target="_blank">
-                                Баланс
+                            <a class="nav-link an-color" href="/register" target="_blank">
+                                Регистрация
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link an-color" href="/profile" target="_blank">
+                                Профиль
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link an-color" href="/profile" target="_blank">
+                                Платежи
                             </a>
                         </li>
                     </ul>
                 </div>
             </div>
+
+            <!-- Информация -->
             <div class="col-md-2 col-sm-6 col-6 mb-4">
+                <div>
+                    <h6 class="text-sm an-color">Информация</h6>
+                    <ul class="flex-column ms-n3 nav">
+                        <li class="nav-item">
+                            <a class="nav-link an-color" href="/about" target="_blank">
+                                О платформе
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link an-color" href="/contacts" target="_blank">
+                                Контакты
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link an-color" href="/blog" target="_blank">
+                                Блог
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link an-color" href="/faq" target="_blank">
+                                FAQ
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
 
-            </div><div class="col-md-2 col-sm-6 col-6 mb-4">
+            <!-- Контакты -->
+            <div class="col-md-3 col-sm-6 col-6 mb-4">
+                <div>
+                    <h6 class="text-sm an-color">Контакты</h6>
+                    <ul class="flex-column ms-n3 nav">
+                        <li class="nav-item d-flex align-items-center mb-2">
+                            <i class="fas fa-map-marker-alt me-2"></i>
+                            <span class="an-color">Москва, ул. Текстильная, 15</span>
+                        </li>
+                        <li class="nav-item d-flex align-items-center mb-2">
+                            <i class="fas fa-phone-alt me-2"></i>
+                            <a class="nav-link an-color p-0" href="tel:+74951234567">+7 (495) 123-45-67</a>
+                        </li>
+                        <li class="nav-item d-flex align-items-center mb-2">
+                            <i class="fas fa-envelope me-2"></i>
+                            <a class="nav-link an-color p-0" href="mailto:info@textileserver.ru">info@textileserver.ru</a>
+                        </li>
+                        <li class="nav-item d-flex align-items-center mb-2">
+                            <i class="fas fa-clock me-2"></i>
+                            <span class="an-color">Пн-Пт: 9:00-18:00</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
 
+        <!-- Нижняя часть футера -->
+        <div class="row">
+            <div class="col-12">
+                <div class="text-center py-4 border-top">
+                    <p class="mb-0 text-sm an-color">
+                        &copy; 2023 Textile Server. Все права защищены.
+                        <a href="/privacy" class="an-color ms-3">Политика конфиденциальности</a>
+                        <a href="/terms" class="an-color ms-3">Пользовательское соглашение</a>
+                        <a href="/sitemap" class="an-color ms-3">Карта сайта</a>
+                    </p>
+                    <p class="text-xs mt-2 an-color">
+                        ИНН 1234567890, ОГРН 1234567890123
+                    </p>
+                </div>
             </div>
         </div>
     </div>
 </footer>
-
 <!-- Подключаем jQuery перед Select2 -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 

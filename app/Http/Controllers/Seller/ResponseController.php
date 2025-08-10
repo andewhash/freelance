@@ -146,23 +146,22 @@ class ResponseController extends Controller
             ->firstOrFail();
 
         // Удаляем файл из хранилища
-        $path = str_replace('/storage', 'public', $image->file->path);
+        $path = str_replace('/storage', 'public', $image->path);
         Storage::delete($path);
 
         // Удаляем записи из БД
         $image->delete();
-        $image->file()->delete();
 
-        return redirect()->back()->with('success', 'Изображение удалено.');
+        return response()->json(['message'=> 'ok']);
     }
 
     public function getImages($id)
     {
-        $response = Response::with('images.file')->findOrFail($id);
+        $response = Response::with('images')->findOrFail($id);
         $images = $response->images->map(function($image) {
             return [
-                'id' => $image->file_id,
-                'path' => $image->file->path
+                'id' => $image->id,
+                'path' => $image->path
             ];
         });
         
@@ -175,9 +174,9 @@ class ResponseController extends Controller
 
         // Удаляем изображения
         foreach ($response->images as $image) {
-            $path = str_replace('/storage', 'public', $image->file->path);
+            $path = str_replace('/storage', 'public', $image->path);
             Storage::delete($path);
-            $image->file()->delete();
+            $image->delete();
         }
 
         $response->delete();

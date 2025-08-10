@@ -55,11 +55,12 @@ Route::middleware(['auth'])->group(function() {
 
 // Auth Pages
 Route::middleware(['auth', 'verified'])->group(function () {
-     // Платежи
-     Route::post('/payment/robokassa', [PaymentController::class, 'robokassa'])->name('payment.robokassa');
-     Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');
-     Route::get('/payment/fail', [PaymentController::class, 'fail'])->name('payment.fail');
-     Route::post('/payment/result', [PaymentController::class, 'result'])->name('payment.result');
+    // Платежи
+    Route::post('/payment/robokassa', [PaymentController::class, 'robokassa'])->name('payment.robokassa');
+    Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');
+    Route::get('/payment/fail', [PaymentController::class, 'fail'])->name('payment.fail');
+    Route::post('/payment/result', [PaymentController::class, 'result'])->name('payment.result');
+
     // Запрос на проверку компании
     Route::post('/verify-request', [PaidServicesController::class, 'verifyRequest'])->name('paid-services.verify-request');
         

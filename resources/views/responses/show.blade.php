@@ -187,13 +187,13 @@
                         <button class="btn btn-primary btn-lg start-chat" 
                                 data-seller-id="{{ $response->user->id }}" 
                                 data-customer-id="{{ auth()->id() }}">
-                            <i class="fas fa-envelope me-2"></i> Написать сообщение ({{ $response->user->name }})
+                            <i class="fas fa-envelope me-2"></i> Написать сообщение (ДЕМО)
                         </button>
                         @endif
 
-                        <button class="btn btn-outline-secondary">
+                        {{-- <button class="btn btn-outline-secondary">
                             <i class="fas fa-heart me-2"></i> Добавить в избранное
-                        </button>
+                        </button> --}}
                     </div>
                 </div>
             </div>

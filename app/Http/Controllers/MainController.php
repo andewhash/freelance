@@ -78,7 +78,7 @@ class MainController extends Controller
     if ($categoryId) {
         $currentCategory = Category::with('ancestors')->find($categoryId);
         if ($currentCategory) {
-            $breadcrumbs = $currentCategory->ancestors->map(function($item) {
+            $breadcrumbs = $currentCategory->ancestors->reverse()->map(function($item) {
                 return ['id' => $item->id, 'name' => $item->name];
             })->toArray();
             $breadcrumbs[] = ['id' => $currentCategory->id, 'name' => $currentCategory->name];

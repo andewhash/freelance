@@ -54,7 +54,7 @@
             <div class="row">
                 <div class="col-lg-5">
                     <div class="position-sticky pb-lg-5 pb-3 mt-lg-0 ps-2">
-                        <h5 class="text-primary fw-bold text-uppercase primary-text-color">Почему выбирают TextileFinds</h5>
+                        <h5 class="text-primary fw-bold text-uppercase primary-text-color">Почему выбирают TextilServer</h5>
                         <h3 class="mb-4">Ваш идеальный инструмент для текстильного бизнеса</h3>
                         <p class="text-secondary pe-3">
                             Единственный в СНГ маркетплейс с полным циклом услуг для оптовых сделок в текстильной сфере. 
@@ -70,7 +70,7 @@
                                 <div class="card-body text-center p-4">
                                     <i class="bi bi-lightning-charge-fill text-primary mb-3" style="font-size: 2.5rem;"></i>
                                     <h5>Бесплатный сервис</h5>
-                                    <p class="text-muted">Наш сервис абсолютно бесплатный</p>
+                                    <p class="text-muted">Основные функции сервиса абсолютно бесплатные</p>
                                 </div>
                             </div>
                         </div>

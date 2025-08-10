@@ -36,6 +36,7 @@ class ProfileController extends Controller
 
     public function update(Request $request)
     {
+        
         $user = auth()->user();
         
         $validated = $request->validate([
@@ -44,11 +45,11 @@ class ProfileController extends Controller
             'email' => 'string|email|max:255|unique:users,email,'.$user->id,
             'phone' => 'nullable|string|max:20',
             'telegram' => 'nullable|string|max:255',
-            'whatsapp' => 'nullable|string|max:20',
+            'whatsapp' => 'nullable|string|max:255',
             'address' => 'nullable|string|max:255',
-            'country' => 'nullable|string|max:100',
-            'region' => 'nullable|string|max:100',
-            'city' => 'nullable|string|max:100',
+            'country' => 'nullable|string|max:255',
+            'region' => 'nullable|string|max:255',
+            'city' => 'nullable|string|max:255',
             'contact_email' => 'nullable|email|max:255',
             'site' => 'nullable|url|max:255',
         ]);

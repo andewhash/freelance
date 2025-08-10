@@ -8,7 +8,10 @@
             <form method="GET" action="{{ route('responses.catalog') }}" class="card shadow-sm">
                 <div class="card-body">
                     <div class="input-group">
-                        <input type="text" class="form-control" name="search" 
+                        <input type="text" class="form-control catalog-search-input" style="height: 36px;
+                        box-shadow: 0 2px 2px 0 rgb(183 183 183 / 10%), 0 3px 1px -2px rgb(223 223 223 / 18%), 0 1px 5px 0 rgb(201 201 201 / 15%);
+                        border-top-right-radius: 0px !important;
+                        border-bottom-right-radius: 0px !important;" name="search" 
                                placeholder="Поиск по объявлениям..." value="{{ request('search') }}">
                         <button class="btn btn-primary" type="submit">
                             <i class="fas fa-search"></i> Найти
@@ -69,16 +72,9 @@
             <nav aria-label="breadcrumb" class="mb-4">
                 <ol class="breadcrumb bg-white p-3 shadow-sm rounded">
                     <li class="breadcrumb-item"><a href="/">Главная</a></li>
-                    <li class="breadcrumb-item active">Каталог объявлений</li>
+                    <li class="breadcrumb-item active">Каталог предложений</li>
                 </ol>
             </nav>
-            
-            <!-- Результаты поиска -->
-            @if(request('search'))
-            <div class="alert alert-info mb-4">
-                Результаты поиска по запросу: "{{ request('search') }}"
-            </div>
-            @endif
             
             <!-- Список объявлений -->
             @if($responses->count() > 0)

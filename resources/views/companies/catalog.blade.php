@@ -7,7 +7,10 @@
             <form method="GET" action="{{ route('companies.catalog') }}" class="card shadow-sm">
                 <div class="card-body">
                     <div class="input-group">
-                        <input type="text" class="form-control" name="search" 
+                        <input type="text" class="form-control catalog-search-input" style="height: 36px;
+                        box-shadow: 0 2px 2px 0 rgb(183 183 183 / 10%), 0 3px 1px -2px rgb(223 223 223 / 18%), 0 1px 5px 0 rgb(201 201 201 / 15%);
+                        border-top-right-radius: 0px !important;
+                        border-bottom-right-radius: 0px !important;" name="search" 
                                placeholder="Поиск по объявлениям..." value="{{ request('search') }}">
                         <button class="btn btn-primary" type="submit">
                             <i class="fas fa-search"></i> Найти
@@ -75,6 +78,7 @@
             </nav>
             
             <!-- Список компаний -->
+            @if($companies->count() > 0)
             <div class="row">
                 @foreach($companies as $company)
                 <div class="col-md-4 mb-4">
@@ -95,6 +99,11 @@
                 </div>
                 @endforeach
             </div>
+            @else
+            <div class="alert alert-warning">
+                Компании не найдены. Попробуйте изменить параметры поиска.
+            </div>
+            @endif
             
             <!-- Пагинация -->
             <div class="d-flex justify-content-center mt-4">
