@@ -11,7 +11,27 @@ class ProfileController extends Controller
 {
     public function index()
     {
-        return view ('profile.index');
+        $user = auth()->user();
+        
+        $transactions = $user->transactions()->paginate(15);
+        
+        // Получаем позиции для рекламы в поиске
+        $searchPositions = \App\Models\AdPosition::where('type', 'search')
+            ->orderBy('position')
+            ->take(10) // или сколько вам нужно
+            ->get();
+        
+        // Получаем позиции для рекламы в каталоге
+        $catalogPositions = \App\Models\AdPosition::where('type', 'catalog')
+            ->orderBy('position')
+            ->take(10) // или сколько вам нужно
+            ->get();
+        
+        return view('profile.index', compact(
+            'transactions',
+            'searchPositions',
+            'catalogPositions'
+        ));
     }
 
     public function update(Request $request)
@@ -19,9 +39,9 @@ class ProfileController extends Controller
         $user = auth()->user();
         
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'string|max:255',
             'last_name' => 'nullable|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,'.$user->id,
+            'email' => 'string|email|max:255|unique:users,email,'.$user->id,
             'phone' => 'nullable|string|max:20',
             'telegram' => 'nullable|string|max:255',
             'whatsapp' => 'nullable|string|max:20',

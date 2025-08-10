@@ -100,7 +100,7 @@
             cursor: pointer;
         }
         .bg-gray-200 {
-            background-color: #2e2826 !important;
+            background-color: #b9b9b9 !important;
         } 
 
         .form-check:not(.form-switch) .form-check-input[type="checkbox"]:checked {
@@ -110,12 +110,12 @@
         }
 
         .main-background {
-            background-color: #2e2826 !important;
+            background-color: #d9d9d9 !important;
         }
 
         .secondary-background {
             color: white !important;
-            background: #3a3330 !important;
+            background: #b9b9b9 !important;
         }
 
         .main-color {
@@ -147,9 +147,14 @@
             border-color: #f69459 !important;
 
         }
+        .alert-warning {
+            color:  white !important;
+            background-color: #f69459 !important;
+            border-color: #f69459 !important;
+        }
 
         .secondary-color {
-            color: #9d9390 !important;
+            color: #737373 !important;
         }
 
         .primary-text-color {
@@ -237,6 +242,11 @@
                             </li>
                             @endif
                             @if (auth()->check())
+                                <li class="nav-item d-flex align-items-center mx-2">
+                                    <span class="badge bg-primary" style="font-size: 1rem;">
+                                        Баланс: {{ number_format(auth()->user()->balance, 2) }} ₽
+                                    </span>
+                                </li>
                                 <li class="nav-item d-flex align-items-center mx-2">
                                     <a href="{{route('profile')}}" style="margin-bottom: 0;">
                                         <img src="/storage/avatars/default.png" alt="">
@@ -398,6 +408,7 @@
     }
     
 </script>
+@stack('scripts')
 </body>
 
 </html>

@@ -2,6 +2,22 @@
 
 @section('content')
 <div class="container mt-8 py-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <form method="GET" action="{{ route('companies.catalog') }}" class="card shadow-sm">
+                <div class="card-body">
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="search" 
+                               placeholder="Поиск по объявлениям..." value="{{ request('search') }}">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-search"></i> Найти
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div class="row">
         <!-- Фильтры слева -->
         <div class="col-md-3">
@@ -10,36 +26,32 @@
                     <h5 class="mb-0 main-color" >Фильтры</h5>
                 </div>
                 <div class="card-body">
-                    <!-- Фильтр по странам -->
-                    <div class="mb-4">
-                        <h6 class="font-weight-bold">Страны</h6>
-                        @foreach($countries as $country)
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="country[]" 
-                                   value="{{ $country }}" id="country{{ $country }}"
-                                   @if(in_array($country, request('country', []))) checked @endif>
-                            <label class="form-check-label" for="country{{ $country }}">
-                                {{ $country }}
-                            </label>
-                        </div>
-                        @endforeach
-                    </div>
-                    
+
                     <!-- Фильтр по категориям -->
                     <div class="mb-4">
-                        <h6 class="font-weight-bold">Категории</h6>
-                        @foreach($filterCategories as $category)
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="category[]" 
-                                   value="{{ $category->id }}" id="category{{ $category->id }}"
-                                   @if($category->id == request('category', null)) checked @endif>
-                            <label class="form-check-label" for="category{{ $category->id }}">
-                                {{ $category->name }} ({{ $category->users_count }})
-                            </label>
-                        </div>
-                        @endforeach
+                        <label class="form-label">Категории</label>
+                        <select class="form-control select2" name="categories[]" multiple>
+                            @foreach($allCategories as $category)
+                            <option value="{{ $category->id }}" 
+                                @if(in_array($category->id, $categoryIds)) selected @endif>
+                                {{ $category->name }}
+                            </option>
+                            @endforeach
+                        </select>
                     </div>
                     
+                    <!-- Фильтр по странам -->
+                    <div class="mb-4">
+                        <label class="form-label">Страны</label>
+                        <select class="form-control select2" name="countries[]" multiple>
+                            @foreach($allCountries as $country)
+                            <option value="{{ $country->id }}" 
+                                @if(in_array($country->id, $countryIds)) selected @endif>
+                                {{ $country->name }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
                     <button type="submit" class="btn btn-primary main-btn-active btn-sm">Применить</button>
                     <a href="{{ route('companies.catalog') }}" class="btn btn-outline-secondary btn-sm">Сбросить</a>
                 </div>

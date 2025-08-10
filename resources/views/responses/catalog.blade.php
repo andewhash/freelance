@@ -23,9 +23,9 @@
         <!-- Фильтры слева -->
         <div class="col-md-3">
             <form id="filter-form" method="GET" action="{{ route('responses.catalog') }}">
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0">Фильтры</h5>
+                <div class="card shadow-sm mb-4" style="border: none"> 
+                    <div class="card-header secondary-background text-white">
+                        <h5 class="mb-0 main-color">Фильтры</h5>
                     </div>
                     <div class="card-body">
                         <!-- Фильтр по категориям -->

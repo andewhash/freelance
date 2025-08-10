@@ -124,10 +124,18 @@
                                 </div>
                                 <div class="mb-3">
                                     <label for="description" class="form-label">Описание *</label>
-                                    <textarea class="form-control" name="description" id="description" rows="3" required></textarea>
+                                    <textarea class="form-control" name="description" id="description-input" rows="3" required></textarea>
+                                    <div class="d-flex justify-content-end mt-2">
+                                        <button type="button" id="generate-text-btn" class="btn btn-sm btn-primary" disabled>
+                                            <span id="generate-text-label">Спросить ИИ</span>
+                                            <span id="generate-text-spinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
+                                        </button>
+                                    </div>
                                 </div>
                                
                             </div>
+
+
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="categories" class="form-label">Категории *</label>
@@ -159,8 +167,68 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
-                        <button type="submit" class="btn btn-primary">Создать</button>
+                        <button type="submit" id="submit-btn-create" class="btn btn-primary">Создать</button>
                     </div>
+
+
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const titleInput = document.getElementById('title');
+                            const textArea = document.getElementById('description-input');
+                            const generateBtn = document.getElementById('generate-text-btn');
+                            const generateLabel = document.getElementById('generate-text-label');
+                            const generateSpinner = document.getElementById('generate-text-spinner');
+                            const submitBtn = document.getElementById('submit-btn-create');
+                        
+                            // Активация кнопки при вводе названия
+                            titleInput.addEventListener('input', function() {
+                                generateBtn.disabled = this.value.trim().length === 0;
+                            });
+                        
+                            // Генерация текста через ИИ
+                            generateBtn.addEventListener('click', function() {
+                                const title = titleInput.value.trim();
+                                if (!title) return;
+                        
+                                // Показываем спиннер и блокируем кнопки
+                                generateLabel.textContent = 'Генерация...';
+                                generateSpinner.classList.remove('d-none');
+                                generateBtn.disabled = true;
+                                submitBtn.disabled = true;
+                        
+                                // Запрос к API
+                                fetch('/api/ai/generate', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                    },
+                                    body: JSON.stringify({
+                                        prompt: `Придумай краткое продающее описание только текст для: "${title}"`
+                                    })
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.reply) {
+                                        textArea.value = data.reply;
+                                    } else if (data.error) {
+                                        alert('Ошибка генерации: ' + data.error);
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                    alert('Произошла ошибка при генерации текста');
+                                })
+                                .finally(() => {
+                                    // Восстанавливаем состояние кнопок
+                                    generateLabel.textContent = 'Спросить ИИ';
+                                    generateSpinner.classList.add('d-none');
+                                    generateBtn.disabled = false;
+                                    submitBtn.disabled = false;
+                                });
+                            });
+                        });
+                        </script>
                 </div>
             </form>
         </div>
@@ -374,5 +442,7 @@
                     });
                 });
         });
+
+        
     </script>
 @endsection

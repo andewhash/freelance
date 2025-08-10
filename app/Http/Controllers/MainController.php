@@ -14,6 +14,8 @@ use App\Models\Response;
 use App\Models\Country;
 use App\Mail\RegistrationEmail;
 use Illuminate\Support\Facades\Mail;
+use Http;
+use Illuminate\Support\Facades\RateLimiter;
 
 class MainController extends Controller
 {
@@ -70,7 +72,9 @@ class MainController extends Controller
     $categoryId = request('category');
     $breadcrumbs = [];
     $currentCategory = null;
-    
+    $categoryIds = request('categories', []);
+    $countryIds = request('countries', []);
+
     if ($categoryId) {
         $currentCategory = Category::with('ancestors')->find($categoryId);
         if ($currentCategory) {
@@ -108,18 +112,15 @@ class MainController extends Controller
     $companies = $query->paginate(12);
     
     // Получаем страны и категории для фильтров
-    $countries = ['Узбекистан'];
-    
-    $filterCategories = Category::whereHas('users')
-        ->withCount(['users' => function($q) {
-            
-        }])
-        ->get();
+    $allCountries = Country::get(); // Или ваш источник данных по странам
+    $allCategories = Category::get();
     
     return view('companies.catalog', compact(
         'companies', 
-        'countries', 
-        'filterCategories',
+        'allCategories', 
+        'allCountries',
+        'categoryIds',
+        'countryIds',
         'breadcrumbs',
         'currentCategory'
     ));
@@ -141,7 +142,18 @@ class MainController extends Controller
 
         // Генерация кодов верификации
         $emailCode = rand(100000, 999999);
-        $phoneCode = rand(100000, 999999);
+        // Отправляем запрос на call-верификацию
+        $response = Http::get('https://sms.ru/callcheck/add', [
+            'api_id' => '46407EDC-7206-7930-20AC-2F3E787F5F19',
+            'phone' => $request->phone,
+            'json' => 1
+        ]);
+
+        $callData = $response->json();
+        
+        if ($callData['status'] !== 'OK') {
+            return back()->withErrors(['phone' => __('Укажите верный номер телефона')])->withInput();
+        }
 
         $user = User::create([
             'contact_email' => $request->email,
@@ -151,14 +163,11 @@ class MainController extends Controller
             'password' => Hash::make($request->password),
             'role' => $request->role,
             'email_verification_code' => $emailCode,
-            'phone_verification_code' => $phoneCode,
+            'phone_verification_code' => $callData['call_phone_pretty'].'__'.$callData['check_id'],
         ]);
 
         // Отправка кода на email
         Mail::to($user->email)->send(new RegistrationEmail($user));
-
-        // Здесь должен быть код для отправки SMS с $phoneCode
-        // Например через сервис sms.ru или другой SMS-шлюз
 
         // Сохраняем ID пользователя в сессии для верификации
         session(['verifying_user_id' => $user->id]);
@@ -171,8 +180,150 @@ class MainController extends Controller
         if (!session()->has('verifying_user_id') && !auth()->user()) {
             return redirect()->route('register');
         }
-        return view('auth.verification');
+        
+        $user = auth()->user();
+        
+        if ($user->email_verified_at && $user->phone_verified_at) {
+            return redirect('/profile');
+        }
+        $emailResendAvailable = RateLimiter::remaining('email-resend:'.$user->id, 3);
+        $phoneResendAvailable = RateLimiter::remaining('phone-resend:'.$user->id, 3);
+        
+        return view('auth.verification', compact('emailResendAvailable', 'phoneResendAvailable'));
     }
+
+    public function resendEmailCode(Request $request)
+    {
+        $user = auth()->user();
+        
+        // Проверка CAPTCHA
+        $request->validate([
+            // 'captcha' => 'required|captcha'
+        ]);
+        
+        // Ограничение частоты запросов
+        if (RateLimiter::tooManyAttempts('email-resend:'.$user->id, 3)) {
+            $seconds = RateLimiter::availableIn('email-resend:'.$user->id);
+            return back()->withErrors(['email' => "Повторная отправка будет доступна через {$seconds} секунд"]);
+        }
+        
+        RateLimiter::hit('email-resend:'.$user->id);
+        
+        $emailCode = rand(100000, 999999);
+        $user->update([
+            'email_verification_code' => $emailCode,
+            'email_verified_at' => null
+        ]);
+        
+        Mail::to($user->email)->send(new RegistrationEmail($user));
+        
+        return back()->with('success', 'Новый код подтверждения отправлен на ваш email');
+    }
+
+    public function changeEmail(Request $request)
+    {
+        $user = auth()->user();
+        
+        $request->validate([
+            'email' => 'required|email|unique:users,email,'.$user->id,
+            // 'captcha' => 'required|captcha'
+        ]);
+        
+        // Ограничение частоты смены email
+        if (RateLimiter::tooManyAttempts('email-change:'.$user->id, 1)) {
+            $seconds = RateLimiter::availableIn('email-change:'.$user->id);
+            return back()->withErrors(['email' => "Смена email будет доступна через {$seconds} секунд"]);
+        }
+        
+        RateLimiter::hit('email-change:'.$user->id, 60); // 1 минута
+        
+        $emailCode = rand(100000, 999999);
+        $user->update([
+            'email' => $request->email,
+            'email_verification_code' => $emailCode,
+            'email_verified_at' => null
+        ]);
+        
+        Mail::to($user->email)->send(new RegistrationEmail($user));
+        
+        return back()->with('success', 'На новый email отправлен код подтверждения');
+    }
+
+    public function resendPhoneVerification(Request $request)
+    {
+        $user = auth()->user();
+        
+        // Проверка CAPTCHA
+        $request->validate([
+            // 'captcha' => 'required|captcha'
+        ]);
+        
+        // Ограничение частоты запросов
+        if (RateLimiter::tooManyAttempts('phone-resend:'.$user->id, 3)) {
+            $seconds = RateLimiter::availableIn('phone-resend:'.$user->id);
+            return back()->withErrors(['phone' => "Повторная отправка будет доступна через {$seconds} секунд"]);
+        }
+        
+        RateLimiter::hit('phone-resend:'.$user->id);
+        
+        $response = Http::get('https://sms.ru/callcheck/add', [
+            'api_id' => '46407EDC-7206-7930-20AC-2F3E787F5F19',
+            'phone' => $user->phone,
+            'json' => 1
+        ]);
+
+        $callData = $response->json();
+        
+        if ($callData['status'] !== 'OK') {
+            return back()->withErrors(['phone' => 'Ошибка при запросе call-верификации']);
+        }
+        
+        $user->update([
+            'phone_verification_code' => $callData['call_phone_pretty'].'__'.$callData['check_id'],
+            'phone_verified_at' => null
+        ]);
+        
+        return back()->with('success', 'Новый номер для звонка сгенерирован');
+    }
+
+    public function changePhone(Request $request)
+    {
+        $user = auth()->user();
+        
+        $request->validate([
+            'phone' => 'required|unique:users,phone,'.$user->id,
+            // 'captcha' => 'required|captcha'
+        ]);
+        
+        // Ограничение частоты смены телефона
+        if (RateLimiter::tooManyAttempts('phone-change:'.$user->id, 1)) {
+            $seconds = RateLimiter::availableIn('phone-change:'.$user->id);
+            return back()->withErrors(['phone' => "Смена телефона будет доступна через {$seconds} секунд"]);
+        }
+        
+        RateLimiter::hit('phone-change:'.$user->id, 180); // 3 минуты
+        
+        $response = Http::get('https://sms.ru/callcheck/add', [
+            'api_id' => '46407EDC-7206-7930-20AC-2F3E787F5F19',
+            'phone' => $request->phone,
+            'json' => 1
+        ]);
+
+        $callData = $response->json();
+        
+        if ($callData['status'] !== 'OK') {
+            return back()->withErrors(['phone' => 'Укажите верный номер телефона']);
+        }
+        
+        $user->update([
+            'phone' => $request->phone,
+            'phone_verification_code' => $callData['call_phone_pretty'].'__'.$callData['check_id'],
+            'phone_verified_at' => null
+        ]);
+        
+        return back()->with('success', 'На новый номер отправлен запрос call-верификации');
+    }
+
 
     public function verifyEmail(Request $request)
     {
@@ -199,11 +350,26 @@ class MainController extends Controller
 
     public function verifyPhone(Request $request)
     {
-        $request->validate(['code' => 'required|digits:6']);
+        $user = auth()->user();
+        
+        if (!$user) {
+            return redirect()->route('register');
+        }
 
-        $user = User::find(session('verifying_user_id'));
+        // Разделяем сохраненные данные
+        $phoneVerificationData = explode('__', $user->phone_verification_code);
+        $checkId = end($phoneVerificationData);
 
-        if ($user->phone_verification_code == $request->code) {
+        // Проверяем статус звонка
+        $response = Http::get('https://sms.ru/callcheck/status', [
+            'api_id' => '46407EDC-7206-7930-20AC-2F3E787F5F19',
+            'check_id' => $checkId,
+            'json' => 1
+        ]);
+
+        $statusData = $response->json();
+
+        if ($statusData['status'] === 'OK' && $statusData['check_status'] == '401') {
             $user->update([
                 'phone_verified_at' => now(),
                 'phone_verification_code' => null
@@ -215,7 +381,7 @@ class MainController extends Controller
             return redirect()->route('profile');
         }
 
-        return back()->withErrors(['code' => 'Неверный код подтверждения']);
+        return back()->withErrors(['phone' => 'Звонок не подтвержден. Пожалуйста, позвоните на указанный номер.']);
     }
 
     public function requestsCatalog()
@@ -264,9 +430,11 @@ class MainController extends Controller
             'countryIds'
         ));
     }
-    public function requestsShow(ModelRequest $order)
+    public function requestsShow($orderId)
     {
+        $order = ModelRequest::findOrFail($orderId);
         $order->load('customer');
+        
         return view('requests.show', compact('order'));
     }
 

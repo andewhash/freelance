@@ -19,11 +19,19 @@ return [
         'secret' => env('MAILGUN_SECRET'),
         'endpoint' => env('MAILGUN_ENDPOINT', 'api.mailgun.net'),
     ],
-
+    'recaptcha' => [
+        'site_key' => env('RECAPTCHA_SITE_KEY'),
+        'secret_key' => env('RECAPTCHA_SECRET_KEY'),
+    ],
     'postmark' => [
         'token' => env('POSTMARK_TOKEN'),
     ],
-
+    'robokassa' => [
+        'login' => env('ROBOKASSA_LOGIN'),
+        'password1' => env('ROBOKASSA_PASSWORD1'),
+        'password2' => env('ROBOKASSA_PASSWORD2'),
+        'test_mode' => env('ROBOKASSA_TEST_MODE', true),
+    ],
     'ses' => [
         'key' => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),

@@ -48,4 +48,9 @@ class Request extends Model
         return $this->belongsTo(User::class, 'customer_id');
     }
 
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'customer_id');
+    }
+
 }

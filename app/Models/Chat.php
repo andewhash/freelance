@@ -36,4 +36,18 @@ class Chat extends Model
     {
         return $this->hasMany(ChatMessage::class);
     }
+
+    public function latestMessage()
+    {
+        return $this->hasOne(ChatMessage::class)->latestOfMany();
+    }
+
+
+    public function hasUnreadMessages($userId)
+    {
+        return $this->messages()
+            ->where('user_id', '!=', $userId)
+            ->where('is_read', false)
+            ->exists();
+    }
 }

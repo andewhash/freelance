@@ -71,6 +71,11 @@ class User extends Authenticatable
         return $this->hasMany(Transaction::class);
     }
 
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
     public function chats()
     {
         if ($this->role == UserRoleEnum::SELLER) {
