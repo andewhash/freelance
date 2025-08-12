@@ -17,6 +17,7 @@ class AdminSeeder extends Seeder
             ['email' => 'admin@example.com'], // Уникальный идентификатор (email)
             [
                 'name' => 'Admin User',
+                'contact_email'=> "admin@example.com",
                 'password' => Hash::make('adminpassword'), // Защищенный пароль
                 'role' => 'ADMIN',
                 'image_url' => '/avatars/admin.png', // Можно использовать иконку или изображение для администратора

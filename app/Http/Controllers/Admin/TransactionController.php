@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Repositories\TransactionRepository;
 use App\Http\Controllers\Controller;
+use App\Models\Transaction;
+
 class TransactionController extends Controller
 {
     private TransactionRepository $transactionRepository;
@@ -15,7 +17,7 @@ class TransactionController extends Controller
 
     public function index()
     {
-        $transactions = $this->transactionRepository->getAll();
+        $transactions = Transaction::with('user')->latest()->paginate(20);
         return view('admin.transactions', compact('transactions'));
     }
 }

@@ -2,17 +2,31 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Order;
+
+use App\Models\Transaction;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Auth;
 use Hash;
+
 class AdminController extends Controller
 {
     public function index()
     {
-        $orders = Order::all();
+        // Получаем статистику
+        $totalEarnings = Transaction::where('status', 'completed')->sum('amount');
+        $totalUsers = User::count();
+        $totalTransactions = Transaction::count();
+        $recentTransactions = Transaction::with('user')->latest()->take(5)->get();
+        $recentUsers = User::latest()->take(5)->get();
 
-        return view('admin.index', ['orders' => $orders]);
+        return view('admin.index', [
+            'totalEarnings' => $totalEarnings,
+            'totalUsers' => $totalUsers,
+            'totalTransactions' => $totalTransactions,
+            'recentTransactions' => $recentTransactions,
+            'recentUsers' => $recentUsers
+        ]);
     }
 
     public function login()
