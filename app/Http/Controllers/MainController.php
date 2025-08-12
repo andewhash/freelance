@@ -392,7 +392,11 @@ class MainController extends Controller
         $breadcrumbs = [];
         
         $query = ModelRequest::query()->with('categories', 'countries');
-        
+        $user = auth()->user();
+        $hasPremium = $user && $user->has_premium_subscription == 1;
+        if (!$hasPremium) {
+            $query->where('created_at', '<=', now()->subHour());
+        }    
         // Фильтр по категориям (мультиселект)
         if (!empty($categoryIds)) {
             $query->whereHas('categories', function($q) use ($categoryIds) {
@@ -445,7 +449,12 @@ class MainController extends Controller
         $searchQuery = request('search');
         $breadcrumbs = [];
         
-        $query = Response::query()->with('user', 'category', 'countries', 'images');
+        $query = Response::query()
+            ->select('responses.*') // Явно указываем таблицу для избежания конфликтов
+            ->with('user', 'category', 'countries', 'images')
+            ->join('users', 'responses.user_id', '=', 'users.id') // Подключаем таблицу пользователей
+            ->orderBy('users.order_search', 'desc') // Сначала сортируем по order_search (чем больше - тем выше)
+            ->orderBy('responses.created_at', 'desc'); // Затем по дате создания (новые выше)
         
         // Фильтр по категориям (мультиселект)
         if (!empty($categoryIds)) {
@@ -464,8 +473,8 @@ class MainController extends Controller
         // Поиск по тексту или заголовку
         if ($searchQuery) {
             $query->where(function($q) use ($searchQuery) {
-                $q->where('text', 'like', "%{$searchQuery}%")
-                ->orWhere('title', 'like', "%{$searchQuery}%");
+                $q->where('responses.text', 'like', "%{$searchQuery}%")
+                  ->orWhere('responses.title', 'like', "%{$searchQuery}%");
             });
         }
         

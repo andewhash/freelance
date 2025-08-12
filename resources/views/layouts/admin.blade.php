@@ -50,11 +50,34 @@
                 </a>
             </li>
 
+            <li class="nav-item">
+                <a class="nav-link {{ request()->is('admin/paid-features*') ? 'active bg-gradient-dark text-white' : 'text-dark' }}" href="{{ route('admin.paid-features.index') }}">
+                    <i class="material-symbols-rounded opacity-5">paid</i>
+                    <span class="nav-link-text ms-1">Платные функции</span>
+                </a>
+            </li>
+
             <!-- Пользователи -->
             <li class="nav-item">
                 <a class="nav-link {{ request()->is('admin/users*') ? 'active bg-gradient-dark text-white' : 'text-dark' }}" href="{{ route('admin.users') }}">
                     <i class="material-symbols-rounded opacity-5">view_in_ar</i>
                     <span class="nav-link-text ms-1">Пользователи</span>
+                </a>
+            </li>
+
+             <!-- Заявки -->
+            <li class="nav-item">
+                <a class="nav-link {{ request()->is('admin/requests*') ? 'active bg-gradient-dark text-white' : 'text-dark' }}" href="{{ route('admin.requests.index') }}">
+                    <i class="material-symbols-rounded opacity-5">request_quote</i>
+                    <span class="nav-link-text ms-1">Заявки</span>
+                </a>
+            </li>
+
+            <!-- Объявления -->
+            <li class="nav-item">
+                <a class="nav-link {{ request()->is('admin/responses*') ? 'active bg-gradient-dark text-white' : 'text-dark' }}" href="{{ route('admin.responses.index') }}">
+                    <i class="material-symbols-rounded opacity-5">campaign</i>
+                    <span class="nav-link-text ms-1">Объявления</span>
                 </a>
             </li>
         </ul>

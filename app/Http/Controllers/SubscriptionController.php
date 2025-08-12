@@ -31,7 +31,7 @@ class SubscriptionController extends Controller
             'user_id' => $user->id,
             'service_type' => 'premium_subscription',
             'amount' => $cost,
-            'status' => 'completed',
+            'status' => 'confirmed',
             'details' => 'Подписка "Я первый" на 1 месяц'
         ]);
 

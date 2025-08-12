@@ -5,15 +5,9 @@
     <div class="row mt-5 mb-4">
         <div class="col-lg-10 mb-md-0 mb-4">
             <div class="card">
-                <div class="card-header pb-0">
-                    <div class="row">
-                        <div class="col-lg-6 col-7">
-                            <h6>Транзакции</h6>
-                            <p class="text-sm mb-0">
-                                <i class="fa fa-check text-info" aria-hidden="true"></i>
-                                Всего <span class="font-weight-bold ms-1">{{ $transactions->count() }}</span> транзакций
-                            </p>
-                        </div>
+                <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                    <div class="bg-gradient-dark shadow-dark border-radius-lg pt-4 pb-3">
+                        <h6 class="text-white text-capitalize ps-3">Список Транзакций</h6>
                     </div>
                 </div>
                 <div class="card-body px-0 pb-2">

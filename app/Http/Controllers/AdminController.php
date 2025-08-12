@@ -3,30 +3,68 @@
 namespace App\Http\Controllers;
 
 
+
+use App\Models\Request;
+use App\Models\Response;
 use App\Models\Transaction;
 use App\Models\User;
-use Illuminate\Http\Request;
+use Illuminate\Http\Request as HttpRequest;
+use Illuminate\Support\Facades\DB;
 use Auth;
-use Hash;
-
 class AdminController extends Controller
 {
     public function index()
     {
-        // Получаем статистику
-        $totalEarnings = Transaction::where('status', 'completed')->sum('amount');
-        $totalUsers = User::count();
-        $totalTransactions = Transaction::count();
-        $recentTransactions = Transaction::with('user')->latest()->take(5)->get();
-        $recentUsers = User::latest()->take(5)->get();
+        $stats = [
+            'totalEarnings' => Transaction::where('status', 'completed')->sum('amount'),
+            'totalUsers' => User::count(),
+            'totalTransactions' => Transaction::count(),
+            'totalRequests' => Request::count(),
+            'totalResponses' => Response::count(),
+            'recentTransactions' => Transaction::with('user')->latest()->take(5)->get(),
+            'recentUsers' => User::latest()->take(5)->get(),
+            'recentRequests' => Request::with('customer')->latest()->take(5)->get(),
+            'recentResponses' => Response::with('user')->latest()->take(5)->get()
+        ];
 
-        return view('admin.index', [
-            'totalEarnings' => $totalEarnings,
-            'totalUsers' => $totalUsers,
-            'totalTransactions' => $totalTransactions,
-            'recentTransactions' => $recentTransactions,
-            'recentUsers' => $recentUsers
-        ]);
+        return view('admin.index', $stats);
+    }
+
+    public function deleteUser(User $user)
+    {
+        if ($user->role == 'admin') {
+            
+        }
+
+        DB::transaction(function () use ($user) {
+            // Удаляем связанные данные
+            $user->transactions()->delete();
+            $user->requests()->delete();
+            $user->responses()->delete();
+            
+            // Удаляем самого пользователя
+            $user->delete();
+        });
+
+        return back()->with('success', 'Пользователь и все связанные данные успешно удалены');
+    }
+
+    public function deleteRequest(Request $request)
+    {
+        DB::transaction(function () use ($request) {
+            // Удаляем связанные отклики
+            $request->responses()->delete();
+            // Удаляем саму заявку
+            $request->delete();
+        });
+
+        return back()->with('success', 'Заявка и все связанные отклики успешно удалены');
+    }
+
+    public function deleteResponse(Response $response)
+    {
+        $response->delete();
+        return back()->with('success', 'Объявление успешно удалено');
     }
 
     public function login()

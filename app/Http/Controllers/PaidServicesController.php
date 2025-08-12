@@ -27,6 +27,8 @@ class PaidServicesController extends Controller
         ]);
         
         // Здесь можно отправить уведомление админу
+        $user->balance -= 50;
+        $user->save();
         
         return back()->with('success', 'Запрос на проверку компании отправлен. Ожидайте решения администратора.');
     }

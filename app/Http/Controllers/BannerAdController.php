@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\BannerAd;
+use App\Models\ServiceTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -47,7 +48,7 @@ class BannerAdController extends Controller
             'user_id' => $user->id,
             'service_type' => 'banner_ad',
             'amount' => $cost,
-            'status' => 'completed',
+            'status' => 'confirmed',
             'details' => 'Баннерная реклама на ' . $request->duration . ' месяцев'
         ]);
 

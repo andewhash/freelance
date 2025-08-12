@@ -5,16 +5,11 @@
     <div class="row mt-5 mb-4">
         <div class="col-lg-10 mb-md-0 mb-4">
             <div class="card">
-                <div class="card-header pb-0">
-                    <div class="row">
-                        <div class="col-lg-6 col-7">
-                            <h6>Пользователи</h6>
-                            <p class="text-sm mb-0">
-                                <i class="fa fa-users text-info" aria-hidden="true"></i>
-                                Всего <span class="font-weight-bold ms-1">{{ $users->count() }}</span> пользователей
-                            </p>
-                        </div>
+                <div class="card-header  p-0 position-relative mt-n4 mx-3 z-index-2">
+                    <div class="bg-gradient-dark shadow-dark border-radius-lg pt-4 pb-3">
+                        <h6 class="text-white text-capitalize ps-3">Список Пользователей</h6>
                     </div>
+                   
                 </div>
                 <div class="card-body px-0 pb-2">
                     <div class="table-responsive">

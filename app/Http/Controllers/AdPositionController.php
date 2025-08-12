@@ -41,7 +41,7 @@ class AdPositionController extends Controller
         'user_id' => $user->id,
         'service_type' => 'search_ad',
         'amount' => $bidAmount,
-        'status' => 'completed',
+        'status' => 'confirmed',
         'details' => 'Реклама в поиске с ставкой ' . $bidAmount . ' ₽'
     ]);
 
@@ -84,7 +84,7 @@ public function bidCatalog(Request $request)
         'user_id' => $user->id,
         'service_type' => 'catalog_ad',
         'amount' => $bidAmount,
-        'status' => 'completed',
+        'status' => 'confirmed',
         'details' => 'Реклама в каталоге с ставкой ' . $bidAmount . ' ₽'
     ]);
 

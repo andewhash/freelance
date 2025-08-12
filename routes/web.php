@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\PaidFeatureController;
 use App\Http\Controllers\AdPositionController;
 use App\Http\Controllers\BannerAdController;
 use App\Http\Controllers\ChatController;
@@ -18,7 +19,8 @@ use App\Http\Controllers\Admin\SettingController;
 use Illuminate\Support\Facades\Auth;
 use App\Enum\User\UserRoleEnum;
 use App\Http\Controllers\ProfileController;
-
+use App\Http\Controllers\Admin\RequestController;
+use App\Http\Controllers\Admin\ResponseController as AdminResponseController;
 
 Route::get('/', [\App\Http\Controllers\MainController::class, 'index'])->name('home');
 // Auth Login|Register Pages
@@ -66,7 +68,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         
     // Баннерная реклама
     Route::get('/banner', [BannerAdController::class, 'create'])->name('paid-services.banner');
-    Route::post('/banner', [BannerAdController::class, 'store']);
+    Route::post('/banner', [BannerAdController::class, 'store'])->name('paid-services.banner.store');
 
     // Реклама в поиске
     Route::post('/bid-search', [AdPositionController::class, 'bidSearch'])->name('paid-services.bid-search');
@@ -120,20 +122,26 @@ Route::post('/admin/login/form', [AdminController::class, 'loginForm'])->name('a
 
 // Проверка, что пользователь авторизован и является администратором
 Route::middleware(['role:' . UserRoleEnum::ADMIN])->prefix('admin')->as('admin.')->group(function () {
-
-    // Главная страница для администратора
+    // Главная админки
     Route::get('/', [AdminController::class, 'index'])->name('index');
-
-
-    // Страница пользователей
+        
+    // Управление пользователями
     Route::get('/users', [UserController::class, 'index'])->name('users');
+    Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');
+    Route::delete('/users/{user}', [AdminController::class, 'deleteUser'])->name('users.delete');
 
+    // Управление заявками
+    Route::get('/requests', [RequestController::class, 'index'])->name('requests.index');
+    Route::get('/requests/{request}', [RequestController::class, 'show'])->name('requests.show');
+    Route::delete('/requests/{request}', [AdminController::class, 'deleteRequest'])->name('requests.delete');
+
+    // Управление объявлениями
+    Route::get('/responses', [AdminResponseController::class, 'index'])->name('responses.index');
+    Route::get('/responses/{response}', [AdminResponseController::class, 'show'])->name('responses.show');
+    Route::delete('/responses/{response}', [AdminController::class, 'deleteResponse'])->name('responses.delete');
     // Страница транзакций
     Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions');
 
-    // Страница заказов
-    Route::get('/orders', [OrderController::class, 'index'])->name('orders');
-
-    // Страница настроек
-    Route::get('//settings', [SettingController::class, 'index'])->name('settings');
+    Route::get('/paid-features', [PaidFeatureController::class, 'index'])->name('paid-features.index');
+    Route::post('/paid-features/{id}/confirm', [PaidFeatureController::class, 'confirm'])->name('paid-features.confirm');
 });
