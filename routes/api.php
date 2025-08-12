@@ -24,7 +24,7 @@ Route::any('/ai/generate', function(Request $request) {
     try {
         // Устанавливаем таймаут 30 секунд для HTTP-запроса
         $response = Http::timeout(30)->withHeaders([
-            'Authorization' => 'Bearer ' . env('OPENROUTER_API_KEY', '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'),
+            'Authorization' => 'Bearer ' . env('OPENROUTER_API_KEY', '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'),
             'Content-Type' => 'application/json'
         ])->post('https://openrouter.ai/api/v1/chat/completions', [
              'model' => 'deepseek/deepseek-chat-v3-0324:free',

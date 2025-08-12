@@ -26,6 +26,19 @@
     <!-- CSS Files -->
     <link id="pagestyle" href="/assets/css/material-dashboard.css?v=3.2.0" rel="stylesheet" />
     <style>
+        /* Стилизация для input type="file" */
+        .form-control[type="file"]::file-selector-button {
+          margin-right: 15px; /* Увеличиваем отступ справа от кнопки */
+          padding: 0 20px; /* Добавляем отступы внутри кнопки */
+        }
+        
+        /* Для современных браузеров */
+        .form-control[type="file"]::-webkit-file-upload-button {
+          margin-right: 15px;
+          padding: 0 20px;
+        }
+      </style>
+    <style>
         .input-group.is-focused .form-control {
             background-image: linear-gradient(0deg, #f69459 2px, rgba(156, 39, 176, 0) 0), linear-gradient(0deg, #d2d2d2 1px, hsla(0, 0%, 82%, 0) 0) !important;
         }
@@ -445,8 +458,11 @@
                 <div class="text-center py-4 border-top">
                     <p class="mb-0 text-sm an-color">
                         &copy; 2023 Textile Server. Все права защищены.
-                        <a href="/privacy" class="an-color ms-3">Политика конфиденциальности</a>
-                        <a href="/terms" class="an-color ms-3">Пользовательское соглашение</a>
+                        <a href="/docs/terms_privacy.docx" class="an-color ms-3">Политика конфиденциальности</a>
+                        <a href="/docs/user_agreements.docx" class="an-color ms-3">Пользовательское соглашение</a>
+                        <a href="/docs/placement.docx" class="an-color ms-3">Правила размешения</a>
+                        <a href="/docs/offert.docx" class="an-color ms-3">Оферта</a>
+
                         <a href="/sitemap" class="an-color ms-3">Карта сайта</a>
                     </p>
                     <p class="text-xs mt-2 an-color">
