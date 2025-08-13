@@ -82,22 +82,22 @@
                 @foreach($requests as $request)
                 <div class="col-md-4 mb-4">
                     <div class="card h-100 shadow-sm">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ $request->title }}</h5>
-                            <p class="card-text">{{ Str::limit($request->description, 100) }}</p>
+                        <div class="card-body" style="padding: 10px 1rem">
+                            <h5 class="card-title" style="margin-bottom: 4px;">{{ $request->title }}</h5>
+                            <p class="card-text"  style="margin-bottom: 6px;">{{ Str::limit($request->description, 100) }}</p>
                             <div class="d-flex flex-wrap gap-2 mb-2">
-                                @foreach($request->countries as $country)
-                                <span class="badge bg-secondary" style="font-size:12px;">{{ $country->name }}</span>
+                                @foreach($request->countries->take(3) as $country)
+                                <span class="badge bg-secondary" style="font-size:9px;">{{ $country->name }}</span>
                                 @endforeach
                             </div>
                             <div class="mb-2">
-                                @foreach($request->categories as $category)
-                                <span class="badge bg-primary" style="font-size:12px;">{{ $category->name }}</span>
+                                @foreach($request->categories->take(3) as $category)
+                                <span class="badge bg-primary" style="font-size:9px;">{{ $category->name }}</span>
                                 @endforeach
                             </div>
                           
                         </div>
-                        <div class="card-footer bg-white">
+                        <div class="card-footer bg-white" style="padding: 0 1rem">
                             <a href="{{ route('requests.show', $request->id) }}" class="btn btn-sm btn-primary">Подробнее</a>
                         </div>
                     </div>
@@ -114,7 +114,7 @@
             @if($requests->hasPages())
             <div class="d-flex justify-content-center mt-4">
                 <nav aria-label="Page navigation">
-                    <ul class="pagination shadow-sm">
+                    <ul class="pagination ">
                         {{ $requests->withQueryString()->onEachSide(1)->links('vendor.pagination.custom') }}
                     </ul>
                 </nav>

@@ -81,12 +81,12 @@
             @if($companies->count() > 0)
             <div class="row">
                 @foreach($companies as $company)
-                <div class="col-md-4 mb-4">
+                <div class="col-md-4 mb-4" >
                     <div class="card h-100 shadow-sm">
                         <img src="{{ $company->image_url }}" class="card-img-top" alt="{{ $company->name }}" style="height: 180px; object-fit: cover;">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ $company->name }}</h5>
-                            <p class="card-text text-muted">{{ $company->country }}</p>
+                        <div class="card-body" style="padding: 10px 1rem">
+                            <h5 class="card-title"  style="margin-bottom: 4px;">{{ $company->name }}</h5>
+                            <p class="card-text"  style="margin-bottom: 6px;">{{ $company->country }}</p>
                             <div class="d-flex justify-content-between align-items-center">
                                 <div class="badge bg-primary">{{ $company->business_type }}</div>
                                 <small class="text-muted">{{ $company->year }} год</small>
@@ -108,7 +108,7 @@
             <!-- Пагинация -->
             <div class="d-flex justify-content-center mt-4">
                 <nav aria-label="Page navigation">
-                    <ul class="pagination shadow-sm">
+                    <ul class="pagination ">
                         {{ $companies->onEachSide(1)->links('vendor.pagination.custom') }}
                     </ul>
                 </nav>

@@ -29,6 +29,7 @@ Route::get('/register', [\App\Http\Controllers\MainController::class, 'showRegis
 Route::post('/login', [\App\Http\Controllers\MainController::class, 'login'])->name('login');
 Route::post('/register', [\App\Http\Controllers\MainController::class, 'register'])->name('register');
 
+Route::get('/tarifs', [MainController::class, 'tarifs']);
 
 // Main Pages
 Route::get('/companies', action: [MainController::class, 'catalog'])->name('companies.catalog');

@@ -86,25 +86,25 @@
                         <img src="{{ asset($response->images->first()->path) }}" class="card-img-top" 
                              alt="{{ $response->title }}" style="height: 180px; object-fit: cover;">
                         @endif
-                        <div class="card-body">
-                            <h5 class="card-title">{{ $response->title }}</h5>
-                            <p class="card-text">{{ Str::limit($response->text, 100) }}</p>
+                        <div class="card-body" style="padding: 10px 1rem">
+                            <h5 class="card-title" style="margin-bottom: 4px;">{{ $response->title }}</h5>
+                            <p class="card-text" style="margin-bottom: 6px;">{{ Str::limit($response->text, 100) }}</p>
                             <div class="d-flex flex-wrap gap-2 mb-2">
-                                @foreach($response->countries as $country)
-                                <span class="badge bg-secondary" style="font-size:12px;">{{ $country->name }}</span>
+                                @foreach($response->countries->take(3) as $country)
+                                <span class="badge bg-secondary" style="font-size:9px;">{{ $country->name }}</span>
                                 @endforeach
                             </div>
 
                             <div class="d-flex flex-wrap gap-2 mb-2">
-                                @foreach($response->categories as $category)
-                                <span class="badge bg-primary" style="font-size:12px;">{{ $category->name }}</span>
+                                @foreach($response->categories->take(3) as $category)
+                                <span class="badge bg-primary" style="font-size:9px;">{{ $category->name }}</span>
                                 @endforeach
                             </div>
                             <div class="d-flex justify-content-between align-items-center">
                                 <small class="text-muted">{{ $response->count }} шт.</small>
                             </div>
                         </div>
-                        <div class="card-footer bg-white">
+                        <div class="card-footer bg-white" style="padding: 0 1rem">
                             <a href="{{ route('responses.show', $response->id) }}" class="btn btn-sm btn-primary">Подробнее</a>
                         </div>
                     </div>
@@ -121,7 +121,7 @@
             @if($responses->hasPages())
             <div class="d-flex justify-content-center mt-4">
                 <nav aria-label="Page navigation">
-                    <ul class="pagination shadow-sm">
+                    <ul class="pagination ">
                         {{ $responses->withQueryString()->onEachSide(1)->links('vendor.pagination.custom') }}
                     </ul>
                 </nav>

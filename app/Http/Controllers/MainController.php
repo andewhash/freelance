@@ -66,65 +66,10 @@ class MainController extends Controller
         return view('companies.show', compact('user'));
     }
 
-    public function catalog()
-{
-    // Получаем выбранную категорию и строим хлебные крошки
-    $categoryId = request('category');
-    $breadcrumbs = [];
-    $currentCategory = null;
-    $categoryIds = request('categories', []);
-    $countryIds = request('countries', []);
-
-    if ($categoryId) {
-        $currentCategory = Category::with('ancestors')->find($categoryId);
-        if ($currentCategory) {
-            $breadcrumbs = $currentCategory->ancestors->reverse()->map(function($item) {
-                return ['id' => $item->id, 'name' => $item->name];
-            })->toArray();
-            $breadcrumbs[] = ['id' => $currentCategory->id, 'name' => $currentCategory->name];
-        }
+    public function tarifs()
+    {
+        return view('tarifs');
     }
-    
-    // Получаем компании с фильтрами
-    $query = User::where('role', 'company')->with('categories');
-    
-    // Фильтр по категории
-    if ($categoryId) {
-        $query->whereHas('categories', function($q) use ($categoryId) {
-            $q->where('categories.id', $categoryId);
-        });
-    }
-    
-    // Фильтр по странам
-    if ($countries = request('country')) {
-        $query->whereIn('country', function($q) use ($countries) {
-            $q->select('name')->from('countries')->whereIn('id', $countries);
-        });
-    }
-    
-    // Фильтр по категориям
-    if ($categories = request('category')) {
-        $query->whereHas('categories', function($q) use ($categories) {
-            $q->where('categories.id', $categories);
-        });
-    }
-    
-    $companies = $query->paginate(12);
-    
-    // Получаем страны и категории для фильтров
-    $allCountries = Country::get(); // Или ваш источник данных по странам
-    $allCategories = Category::get();
-    
-    return view('companies.catalog', compact(
-        'companies', 
-        'allCategories', 
-        'allCountries',
-        'categoryIds',
-        'countryIds',
-        'breadcrumbs',
-        'currentCategory'
-    ));
-}
 
     public function register(Request $request)
     {
@@ -493,6 +438,69 @@ class MainController extends Controller
             'countryIds'
         ));
     }
+
+    public function catalog()
+{
+    // Получаем выбранную категорию и строим хлебные крошки
+    $categoryId = request('category');
+    $breadcrumbs = [];
+    $currentCategory = null;
+    $categoryIds = request('categories', []);
+    $countryIds = request('countries', []);
+
+    if ($categoryId) {
+        $currentCategory = Category::with('ancestors')->find($categoryId);
+        if ($currentCategory) {
+            $breadcrumbs = $currentCategory->ancestors->reverse()->map(function($item) {
+                return ['id' => $item->id, 'name' => $item->name];
+            })->toArray();
+            $breadcrumbs[] = ['id' => $currentCategory->id, 'name' => $currentCategory->name];
+        }
+    }
+    
+    // Получаем компании с фильтрами
+    $query = User::where('role', 'company')
+                ->with('categories')
+                ->orderBy('order_catalog', 'desc') // Сортировка по order_catalog (чем больше - тем выше)
+                ->orderBy('created_at', 'desc'); // Затем по дате создания (новые выше)
+    
+    // Фильтр по категории
+    if ($categoryId) {
+        $query->whereHas('categories', function($q) use ($categoryId) {
+            $q->where('categories.id', $categoryId);
+        });
+    }
+    
+    // Фильтр по странам
+    if ($countries = request('country')) {
+        $query->whereIn('country', function($q) use ($countries) {
+            $q->select('name')->from('countries')->whereIn('id', $countries);
+        });
+    }
+    
+    // Фильтр по категориям
+    if ($categories = request('category')) {
+        $query->whereHas('categories', function($q) use ($categories) {
+            $q->where('categories.id', $categories);
+        });
+    }
+    
+    $companies = $query->paginate(12);
+    
+    // Получаем страны и категории для фильтров
+    $allCountries = Country::get(); // Или ваш источник данных по странам
+    $allCategories = Category::get();
+    
+    return view('companies.catalog', compact(
+        'companies', 
+        'allCategories', 
+        'allCountries',
+        'categoryIds',
+        'countryIds',
+        'breadcrumbs',
+        'currentCategory'
+    ));
+}
 
     public function responsesShow(Response $response)
     {

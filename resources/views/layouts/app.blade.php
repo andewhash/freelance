@@ -345,11 +345,6 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link an-color" href="/products" target="_blank">
-                                Товары
-                            </a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link an-color" href="/responses" target="_blank">
                                 Предложения
                             </a>
@@ -357,11 +352,6 @@
                         <li class="nav-item">
                             <a class="nav-link an-color" href="/requests" target="_blank">
                                 Заявки
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link an-color" href="/categories" target="_blank">
-                                Категории
                             </a>
                         </li>
                     </ul>
@@ -418,6 +408,11 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link an-color" href="/tarifs" target="_blank">
+                                Тарифы
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link an-color" href="/faq" target="_blank">
                                 FAQ
                             </a>
@@ -435,13 +430,10 @@
                             <i class="fas fa-map-marker-alt me-2"></i>
                             <span class="an-color">Москва, ул. Текстильная, 15</span>
                         </li>
-                        <li class="nav-item d-flex align-items-center mb-2">
-                            <i class="fas fa-phone-alt me-2"></i>
-                            <a class="nav-link an-color p-0" href="tel:+74951234567">+7 (495) 123-45-67</a>
-                        </li>
+                        
                         <li class="nav-item d-flex align-items-center mb-2">
                             <i class="fas fa-envelope me-2"></i>
-                            <a class="nav-link an-color p-0" href="mailto:info@textileserver.ru">info@textileserver.ru</a>
+                            <a class="nav-link an-color p-0" href="mailto:info@textileserver.com">info@textileserver.com</a>
                         </li>
                         <li class="nav-item d-flex align-items-center mb-2">
                             <i class="fas fa-clock me-2"></i>
@@ -466,7 +458,7 @@
                         <a href="/sitemap" class="an-color ms-3">Карта сайта</a>
                     </p>
                     <p class="text-xs mt-2 an-color">
-                        ИНН 1234567890, ОГРН 1234567890123
+                        ИНН: 505018877162, ОГРНИП: 324508100611611
                     </p>
                 </div>
             </div>
