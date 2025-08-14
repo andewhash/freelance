@@ -49,7 +49,7 @@ class AdminController extends Controller
         return back()->with('success', 'Пользователь и все связанные данные успешно удалены');
     }
 
-    public function deleteRequest(Request $request)
+    public function deleteRequest(HttpRequest $request)
     {
         DB::transaction(function () use ($request) {
             // Удаляем связанные отклики
@@ -72,7 +72,7 @@ class AdminController extends Controller
         return view ('admin.login');
     }
 
-    public function loginForm(Request $request)
+    public function loginForm(HttpRequest $request)
     {
         $request->validate([
             'email' => 'required|email',

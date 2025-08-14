@@ -32,7 +32,7 @@
                                     <div class="mt-4">
                                         <div class="d-flex justify-content-between mb-2">
                                             <span class="text-muted">Стоимость:</span>
-                                            <span class="fw-bold">$50</span>
+                                            <span class="fw-bold">500₽</span>
                                         </div>
                                         <div class="d-flex justify-content-between">
                                             <span class="text-muted">Текущий статус:</span>
@@ -55,7 +55,7 @@
                                     <div class="mt-4">
                                         <div class="d-flex justify-content-between mb-2">
                                             <span class="text-muted">Стоимость:</span>
-                                            <span class="fw-bold">$100 в месяц</span>
+                                            <span class="fw-bold">1000₽ в месяц</span>
                                         </div>
                                         <div class="d-flex justify-content-between">
                                             <span class="text-muted">Доступные категории:</span>
@@ -78,7 +78,7 @@
                                     <p>Повышение позиции ваших товаров в результатах поиска. Чем выше ставка, тем выше позиция.</p>
                                     
                                     <div class="mt-3">
-                                        <label class="form-label">Текущая ставка 100($)</label>
+                                        <label class="form-label">Текущая ставка 100₽</label>
                                     </div>
                                     <a href="/profile" class="btn btn-sm btn-primary w-100 mt-3">Подробнее</a>
                                 </div>
@@ -97,7 +97,7 @@
 
                                    
                                     <div class="mt-3">
-                                        <label class="form-label">Текущая ставка 100($)</label>
+                                        <label class="form-label">Текущая ставка 100₽</label>
                                     </div>
                                     <a href="/profile" class="btn btn-sm btn-primary w-100 mt-3">Подробнее</a>
                                 </div>
@@ -116,7 +116,7 @@
                                     <div class="mt-4">
                                         <div class="d-flex justify-content-between mb-2">
                                             <span class="text-muted">Стоимость:</span>
-                                            <span class="fw-bold">$100</span>
+                                            <span class="fw-bold">10000₽</span>
                                         </div>
                                         <div class="d-flex justify-content-between">
                                             <span class="text-muted">Длительность:</span>
@@ -140,7 +140,7 @@
                                     <div class="mt-4">
                                         <div class="d-flex justify-content-between mb-2">
                                             <span class="text-muted">Стоимость:</span>
-                                            <span class="fw-bold">$100 в месяц</span>
+                                            <span class="fw-bold">800₽ в месяц</span>
                                         </div>
                                     </div>
                                     <button class="btn btn-sm btn-primary w-100 mt-3">Управлять подпиской</button>
