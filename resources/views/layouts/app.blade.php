@@ -8,201 +8,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="apple-touch-icon" sizes="76x76" href="/assets/img/apple-icon.png">
     <link rel="icon" type="image/png" href="/assets/img/favicon.png">
-    <title>
-        Textile Server
-    </title>
+    <title>Textile Server</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
-    <!--     Fonts and icons     -->
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700,900" />
-    <!-- Nucleo Icons -->
     <link href="/assets/css/nucleo-icons.css" rel="stylesheet" />
     <link href="/assets/css/nucleo-svg.css" rel="stylesheet" />
-    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="/assets/css/index.css">
     <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
-    <!-- Material Icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
-    <!-- CSS Files -->
     <link id="pagestyle" href="/assets/css/material-dashboard.css?v=3.2.0" rel="stylesheet" />
-    <style>
-        /* Стилизация для input type="file" */
-        .form-control[type="file"]::file-selector-button {
-          margin-right: 15px; /* Увеличиваем отступ справа от кнопки */
-          padding: 0 20px; /* Добавляем отступы внутри кнопки */
-        }
-        
-        /* Для современных браузеров */
-        .form-control[type="file"]::-webkit-file-upload-button {
-          margin-right: 15px;
-          padding: 0 20px;
-        }
-      </style>
-    <style>
-        .input-group.is-focused .form-control {
-            background-image: linear-gradient(0deg, #f69459 2px, rgba(156, 39, 176, 0) 0), linear-gradient(0deg, #d2d2d2 1px, hsla(0, 0%, 82%, 0) 0) !important;
-        }
-        .input-group.is-focused label {
-            color: #f69459 !important;
-        }
-        .input-group.input-group-dynamic .form-control, .input-group.input-group-dynamic .form-control:focus, .input-group.input-group-static .form-control, .input-group.input-group-static .form-control:focus {
-            background-image: none;
-        }
-    </style>
-    <style>
-        /* Стили для выпадающего меню категорий */
-        .dropdown-menu-categories {
-            display: none;
-            position: absolute;
-            background-color: white;
-            min-width: 200px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            z-index: 1000;
-            border-radius: 8px;
-            padding: 10px 0;
-        }
-        
-        .dropdown-menu-categories .submenu {
-            display: none;
-            position: absolute;
-            left: 100%;
-            top: -10px;
-            background-color: white;
-            min-width: 200px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            border-radius: 8px;
-            padding: 10px 0;
-        }
-
-        .dropdown-menu-categories .submenu-item {
-            display: none;
-            position: absolute;
-            left: 100%;
-            top: -10px;
-            background-color: white;
-            min-width: 200px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            border-radius: 8px;
-            padding: 10px 0;
-        }
-        
-        .nav-item-catalog:hover .dropdown-menu-categories {
-            display: block;
-        }
-        
-        .dropdown-item-category:hover .submenu {
-            display: block;
-        }
-        
-        .dropdown-item-category {
-            position: relative;
-            padding: 8px 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .dropdown-item-category-2 {
-            position: relative;
-            padding: 8px 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .dropdown-item-category-2:hover .submenu-item {
-            display: block;
-        }
-
-        .dropdown-item-category:hover {
-            background-color: #f8f9fa;
-        }
-        
-        .nav-item-catalog {
-            position: relative;
-        }
-        
-        .nav-link-catalog {
-            cursor: pointer;
-        }
-        .bg-gray-200 {
-            background-color: #b9b9b9 !important;
-        } 
-
-        .form-check:not(.form-switch) .form-check-input[type="checkbox"]:checked {
-            background-color: #f69459 !important;
-            border-color: #f69459 !important;
-            
-        }
-
-        .main-background {
-            background-color: #d9d9d9 !important;
-        }
-
-        .secondary-background {
-            color: white !important;
-            background: #b9b9b9 !important;
-        }
-
-        .main-color {
-            color: white !important;
-        }
-
-        .main-btn-active, .btn-primary {
-            border-color: #f69459 !important;
-            color: white !important;
-            transition: .3 all ease;
-            background-color: #f69459 !important;
-        }
-
-        .main-btn, .btn-outline-primary {
-            border-color: #f69459 !important;
-            color: white !important;
-            transition: .3 all ease;
-        }
-        .main-btn:hover, .btn-outline-primary:hover {
-            background-color: #f69459 !important;
-        }
-
-        .main-icon {
-            background-color: #f69459 !important;
-        }
-
-        .bg-primary {
-            background-color: #f69459 !important;
-            border-color: #f69459 !important;
-
-        }
-
-        .btn-another-primary {
-            border-color: #f69459 !important;
-            color: #f69459 !important;
-            border: 1px solid !important;
-        }
-        .alert-warning {
-            color:  white !important;
-            background-color: #f69459 !important;
-            border-color: #f69459 !important;
-        }
-
-        .secondary-color {
-            color: #737373 !important;
-        }
-
-        .primary-text-color {
-            color: #f69459 !important;
-            
-        }
-
-        .an-color {
-            color: black !important;
-        }
-
-        .input-group .catalog-search-input {
-            height: 36px;
-            box-shadow: 0 2px 2px 0 rgb(183 183 183 / 10%), 0 3px 1px -2px rgb(223 223 223 / 18%), 0 1px 5px 0 rgb(201 201 201 / 15%);
-            border-top-right-radius: 0px !important;
-            border-bottom-right-radius: 0px !important;
-        }
-    </style>
 </head>
 
 <body class="landing-page main-background">
@@ -219,7 +35,7 @@
                     <!-- Добавленная кнопка Каталог компаний -->
                     <div class="nav-item nav-item-catalog mx-2">
                         <a class="" id="catalogDropdown">
-                            Компании
+                            Каталог
                         </a>
                         <div class="dropdown-menu-categories">
                             <!-- Здесь будут динамически загружаться категории -->
@@ -393,17 +209,17 @@
                     <h6 class="text-sm an-color">Информация</h6>
                     <ul class="flex-column ms-n3 nav">
                         <li class="nav-item">
-                            <a class="nav-link an-color" href="/about" target="_blank">
+                            <a class="nav-link an-color" href="/https://www.instagram.com/textilenetwork/" target="_blank">
                                 О платформе
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link an-color" href="/contacts" target="_blank">
+                            <a class="nav-link an-color" href="mailto:info@textileserver.com" target="_blank">
                                 Контакты
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link an-color" href="/blog" target="_blank">
+                            <a class="nav-link an-color" href="/https://www.instagram.com/textilenetwork/" target="_blank">
                                 Блог
                             </a>
                         </li>
@@ -413,7 +229,7 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link an-color" href="/faq" target="_blank">
+                            <a class="nav-link an-color" href="/" target="_blank">
                                 FAQ
                             </a>
                         </li>
@@ -455,7 +271,6 @@
                         <a href="/docs/placement.docx" class="an-color ms-3">Правила размешения</a>
                         <a href="/docs/offert.docx" class="an-color ms-3">Оферта</a>
 
-                        <a href="/sitemap" class="an-color ms-3">Карта сайта</a>
                     </p>
                     <p class="text-xs mt-2 an-color">
                         ИНН: 505018877162, ОГРНИП: 324508100611611
