@@ -15,6 +15,7 @@ class AddPremiumFieldsToUsersTable extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->boolean('has_premium_subscription')->default(false);
+            $table->boolean('is_verified_inn')->default(false);
             $table->date('premium_subscription_until')->nullable();
             $table->decimal('order_search', 10, 2)->default(0);
             $table->decimal('order_catalog', 10, 2)->default(0);
@@ -33,7 +34,8 @@ class AddPremiumFieldsToUsersTable extends Migration
                 'has_premium_subscription',
                 'premium_subscription_until',
                 'order_search',
-                'order_catalog'
+                'order_catalog',
+                'is_verified_inn'
             ]);
         });
     }

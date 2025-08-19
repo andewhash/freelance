@@ -12,8 +12,8 @@ class RobokassaService
     public function __construct()
     {
         $this->login = config('services.robokassa.login');
-        $this->password1 = config('services.robokassa.password1');
-        $this->password2 = config('services.robokassa.password2');
+        $this->password1 = 'w5sxw02saavsjKxfqX03';
+        $this->password2 = 'MxWcfAb308BJqq48DKjX';
         $this->testMode = config('services.robokassa.test_mode');
     }
     

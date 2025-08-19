@@ -9,7 +9,6 @@
         <div class="row">
             <div class="col-12">
                 <div class="card card-body mx-2 mx-md-4 mt-n6">
-
                     <!-- Блок для отображения сообщений об ошибках и успехах -->
                     @if($errors->any())
                         <div style="    margin: 0 10px;" class="alert alert-danger alert-dismissible fade show mt-4" role="alert">
@@ -174,7 +173,9 @@
                                 flex-direction: column;" class="input-group input-group-static mb-4 @error('categories') is-invalid @enderror">
                                     <label for="categories">Категории *</label>
                                     <select class="form-control select2" name="categories[]" id="categories" multiple required>
-                                        @foreach(\App\Models\Category::all() as $category)
+                                        @foreach(\App\Models\Category::whereHas('parent', function($query) {
+    $query->whereHas('parent'); // Только категории с parent->parent
+})->get() as $category)
                                             <option value="{{ $category->id }}" @if(in_array($category->id, old('categories', []))) selected @endif>{{ $category->name }}</option>
                                         @endforeach
                                     </select>
@@ -252,7 +253,9 @@
                                 flex-direction: column;" class="input-group input-group-static mb-4">
                                     <label for="editCategories">Категории *</label>
                                     <select class="form-control select2" name="categories[]" id="editCategories" multiple required>
-                                        @foreach(\App\Models\Category::all() as $category)
+                                        @foreach(\App\Models\Category::whereHas('parent', function($query) {
+    $query->whereHas('parent'); // Только категории с parent->parent
+})->get() as $category)
                                             <option value="{{ $category->id }}">{{ $category->name }}</option>
                                         @endforeach
                                     </select>

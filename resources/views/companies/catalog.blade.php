@@ -20,7 +20,7 @@
             </form>
         </div>
     </div>
-
+@include('components.banners')
     <div class="row">
         <!-- Фильтры слева -->
         <div class="col-md-3">
@@ -69,7 +69,7 @@
                     <li class="breadcrumb-item"><a href="/">Главная</a></li>
                     @foreach($breadcrumbs as $crumb)
                         @if(!$loop->last)
-                        <li class="breadcrumb-item"><a href="{{ route('companies.catalog', ['category' => $crumb['id']]) }}">{{ $crumb['name'] }}</a></li>
+                        <li class="breadcrumb-item">{{ $crumb['name'] }}</li>
                         @else
                         <li class="breadcrumb-item active" aria-current="page">{{ $crumb['name'] }}</li>
                         @endif

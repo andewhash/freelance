@@ -21,6 +21,7 @@
             </form>
         </div>
     </div>
+    @include('components.banners')
 
     <div class="row">
         <!-- Фильтры слева -->

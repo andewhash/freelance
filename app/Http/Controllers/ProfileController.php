@@ -71,9 +71,22 @@ class ProfileController extends Controller
             'exported' => 'required|boolean',
             'count_employers' => 'nullable|string|max:50',
             'year' => 'nullable|string|max:4',
+            'categories.*' => 'exists:categories,id',
+            'countries' => 'sometimes|array',
+            'countries.*' => 'exists:countries,id',
         ]);
         
         $user->update($validated);
+
+        if ($request->has('categories')) {
+            $user->categories()->sync($request->categories);
+        }
+        
+        // Синхронизация стран
+        if ($request->has('countries')) {
+            $user->countries()->sync($request->countries);
+        }
+        
         
         return back()->with('success', 'Информация о компании обновлена');
     }

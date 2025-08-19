@@ -19,7 +19,6 @@ class BannerAdController extends Controller
     {
         $request->validate([
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'categories' => 'required|array',
             'duration' => 'required|integer|min:1'
         ]);
 
@@ -38,7 +37,7 @@ class BannerAdController extends Controller
             'user_id' => $user->id,
             'image_path' => $imagePath,
             'link' => $request->link,
-            'categories' => $request->categories,
+            'categories' => $request->categories ?? [],
             'start_date' => now(),
             'end_date' => now()->addMonths($request->duration)
         ]);
@@ -56,6 +55,6 @@ class BannerAdController extends Controller
         $user->balance -= $cost;
         $user->save();
 
-        return redirect()->route('profile')->with('success', 'Баннер успешно создан и будет активирован после модерации');
+        return redirect()->back()->with('success', 'Баннер успешно создан и будет активирован после модерации');
     }
 }

@@ -21,7 +21,7 @@
             </form>
         </div>
     </div>
-
+    @include('components.banners')
     <div class="row">
         <!-- Фильтры слева -->
         <div class="col-md-3">

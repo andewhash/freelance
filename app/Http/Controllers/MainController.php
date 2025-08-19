@@ -16,11 +16,64 @@ use App\Mail\RegistrationEmail;
 use Illuminate\Support\Facades\Mail;
 use Http;
 use Illuminate\Support\Facades\RateLimiter;
+use App\Services\RobokassaService;
+use App\Models\Transaction;
+use DB;
 
 class MainController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $robokassaService = new RobokassaService();
+        if ($request->has('InvId')) {
+            $invId = $request->InvId;
+            $outSum = $request->OutSum;
+            $signature = $request->SignatureValue;
+            $isTest = $request->IsTest;
+    
+            // Ищем транзакцию по system = robokassa_{InvId}
+            $transaction = Transaction::where('system', 'robokassa_'.$invId)->first();
+    
+            if (!$transaction) {
+                \Log::error("Transaction not found for InvId: {$invId}");
+                return response('Transaction not found', 404);
+            }
+    
+            // Проверяем сумму
+            if ((float)$outSum != (float)$transaction->amount) {
+                \Log::error("Amount mismatch for transaction {$transaction->id}");
+                return response('Amount mismatch', 400);
+            }
+    
+            // Валидируем подпись
+            if (!$robokassaService->validateSuccessSignature($outSum, $invId, $signature, $isTest)) {
+                \Log::error("Invalid signature for transaction {$transaction->id}");
+                return response('Invalid signature', 400);
+            }
+    
+            // Если транзакция уже обработана
+            if ($transaction->status === 'COMPLETED') {
+                return redirect('/profile');
+            }
+    
+            // Обновляем баланс пользователя
+            try {
+                DB::transaction(function () use ($transaction, $outSum) {
+                    $user = User::findOrFail($transaction->user_id);
+                    
+                    $user->increment('balance', $outSum);
+                    $transaction->update(['status' => 'COMPLETED']);
+                    
+                    \Log::info("Balance updated for user {$user->id}. Amount: {$outSum}");
+                });
+                
+                return redirect('/profile');
+            } catch (\Exception $e) {
+                \Log::error("Error processing payment: " . $e->getMessage());
+                return redirect('/profile');
+            }
+        }
+    
         return view('index');
     }
 
@@ -357,17 +410,32 @@ class MainController extends Controller
         }
         
         // Поиск по тексту или заголовку
+        // Улучшенный поиск
         if ($searchQuery) {
-            $query->where(function($q) use ($searchQuery) {
-                $q->where('description', 'like', "%{$searchQuery}%")
-                  ->orWhere('title', 'like', "%{$searchQuery}%");
+            $searchTerms = explode(' ', $searchQuery);
+            
+            $query->where(function($q) use ($searchTerms) {
+                foreach ($searchTerms as $term) {
+                    $q->where(function($subQuery) use ($term) {
+                        $subQuery->where('title', 'like', "%{$term}%")
+                                ->orWhere('description', 'like', "%{$term}%")
+                                ->orWhereHas('categories', function($catQuery) use ($term) {
+                                    $catQuery->where('name', 'like', "%{$term}%");
+                                })
+                                ->orWhereHas('countries', function($countryQuery) use ($term) {
+                                    $countryQuery->where('name', 'like', "%{$term}%");
+                                });
+                    });
+                }
             });
         }
         
         $requests = $query->paginate(12);
         
         $allCountries = Country::get(); // Или ваш источник данных по странам
-        $allCategories = Category::get();
+        $allCategories = Category::whereHas('parent', function($query) {
+            $query->whereHas('parent');
+        })->get();
         
         return view('requests.catalog', compact(
             'requests', 
@@ -417,16 +485,33 @@ class MainController extends Controller
         
         // Поиск по тексту или заголовку
         if ($searchQuery) {
-            $query->where(function($q) use ($searchQuery) {
-                $q->where('responses.text', 'like', "%{$searchQuery}%")
-                  ->orWhere('responses.title', 'like', "%{$searchQuery}%");
+            $searchTerms = explode(' ', $searchQuery);
+            
+            $query->where(function($q) use ($searchTerms) {
+                foreach ($searchTerms as $term) {
+                    $q->where(function($subQuery) use ($term) {
+                        $subQuery->where('responses.title', 'like', "%{$term}%")
+                            ->orWhere('responses.text', 'like', "%{$term}%")
+                            ->orWhereHas('categories', function($catQuery) use ($term) {
+                                $catQuery->where('name', 'like', "%{$term}%");
+                            })
+                            ->orWhereHas('countries', function($countryQuery) use ($term) {
+                                $countryQuery->where('name', 'like', "%{$term}%");
+                            })
+                            ->orWhereHas('user', function($userQuery) use ($term) {
+                                $userQuery->where('name', 'like', "%{$term}%");
+                            });
+                    });
+                }
             });
         }
         
         $responses = $query->paginate(12);
         
         $allCountries = Country::get();
-        $allCategories = Category::get();
+        $allCategories = Category::whereHas('parent', function($query) {
+            $query->whereHas('parent');
+        })->get();
         
         return view('responses.catalog', compact(
             'responses', 
@@ -447,7 +532,7 @@ class MainController extends Controller
     $currentCategory = null;
     $categoryIds = request('categories', []);
     $countryIds = request('countries', []);
-
+    $verifiedOnly = request('verified', false);
     if ($categoryId) {
         $currentCategory = Category::with('ancestors')->find($categoryId);
         if ($currentCategory) {
@@ -484,12 +569,17 @@ class MainController extends Controller
             $q->where('categories.id', $categories);
         });
     }
+     if ($verifiedOnly) {
+        $query->where('is_verified_inn', true);
+    }
     
     $companies = $query->paginate(12);
     
     // Получаем страны и категории для фильтров
     $allCountries = Country::get(); // Или ваш источник данных по странам
-    $allCategories = Category::get();
+    $allCategories = Category::whereHas('parent', function($query) {
+        $query->whereHas('parent');
+    })->get();
     
     return view('companies.catalog', compact(
         'companies', 

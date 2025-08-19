@@ -57,6 +57,11 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    public function countries()
+    {
+        return $this->belongsToMany(Country::class, 'user_countries', 'user_id', 'country_id');
+    }
+
     /**
      * The attributes that should be cast.
      *
