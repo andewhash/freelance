@@ -28,6 +28,7 @@ class ProfileController extends Controller
             ->get();
         
         return view('profile.index', compact(
+            'user',
             'transactions',
             'searchPositions',
             'catalogPositions'
