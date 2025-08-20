@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mt-8 py-5">
+<div class="container mt-4 py-5">
     @include('components.banners')
 
     <!-- Поиск в шапке -->
