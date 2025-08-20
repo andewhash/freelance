@@ -2,6 +2,8 @@
 
 @section('content')
 <div class="container mt-8 py-5">
+    @include('components.banners')
+
     <!-- Поиск в шапке -->
     <div class="row mb-4">
         <div class="col-12">
@@ -21,7 +23,6 @@
             </form>
         </div>
     </div>
-    @include('components.banners')
 
     <div class="row">
         <!-- Фильтры слева -->

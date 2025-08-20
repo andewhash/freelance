@@ -253,7 +253,95 @@
         </div>
     </div>
 </section>
+<!-- Секция последних объявлений -->
+<section id="latest-ads" class="py-2 bg-light"  style="margin-top: 20px; border-radius: 8px">
+    <div class="container">
+        @include('components.banners')
 
+        <div class="row py-4 mb-6 text-center">
+            <div class="col-lg-8 mx-auto">
+                <h5 class="text-primary fw-bold text-uppercase primary-text-color">Свежие предложения</h5>
+                <h2 class="mb-3">Последние добавленные объявления</h2>
+                <p class="lead secondary-text-color">Актуальные предложения от проверенных поставщиков</p>
+            </div>
+        </div>
+
+        <div class="row">
+            @php
+                $latestResponses = \App\Models\Response::with('user', 'categories', 'countries', 'images')
+                    ->orderBy('created_at', 'desc')
+                    ->take(6)
+                    ->get();
+            @endphp
+
+            @forelse($latestResponses->chunk(3) as $chunk)
+                <div class="row mb-4">
+                    @foreach($chunk as $response)
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100 shadow-sm">
+                                @if($response->images->first())
+                                    <img src="{{ asset($response->images->first()->path) }}" class="card-img-top" 
+                                         alt="{{ $response->title }}" style="height: 200px; object-fit: cover;">
+                                @else
+                                    <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" 
+                                         style="height: 200px;">
+                                        <i class="bi bi-image text-white" style="font-size: 3rem;"></i>
+                                    </div>
+                                @endif
+                                
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ Str::limit($response->title, 50) }}</h5>
+                                    <p class="card-text text-muted small">{{ Str::limit($response->text, 80) }}</p>
+                                    
+                                    <div class="d-flex flex-wrap gap-1 mb-2">
+                                        @foreach($response->categories->take(2) as $category)
+                                            <span class="badge bg-primary" style="font-size: 10px;">
+                                                {{ $category->name }}
+                                            </span>
+                                        @endforeach
+                                    </div>
+
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">
+                                            <i class="bi bi-geo-alt"></i> 
+                                            @foreach($response->countries->take(1) as $country)
+                                                {{ $country->name }}
+                                            @endforeach
+                                        </small>
+                                        <small class="text-muted">
+                                            <i class="bi bi-box"></i> {{ $response->count }} шт.
+                                        </small>
+                                    </div>
+                                </div>
+                                
+                                <div class="card-footer bg-white border-0 pt-0">
+                                    <a href="{{ route('responses.show', $response->id) }}" 
+                                       class="btn btn-sm btn-primary w-100">
+                                        Подробнее
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @empty
+                <div class="col-12">
+                    <div class="alert alert-info text-center">
+                        <i class="bi bi-info-circle"></i> Пока нет объявлений
+                    </div>
+                </div>
+            @endforelse
+        </div>
+
+        @if($latestResponses->count() > 0)
+            <div class="text-center mt-4">
+                <a href="{{ route('responses.catalog') }}" class="btn btn-outline-primary">
+                    Смотреть все объявления
+                </a>
+            </div>
+        @endif
+    </div>
+</section>
 <!-- Секция FAQ -->
 <section id="faq" class="py-8">
     <div class="container">

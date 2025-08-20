@@ -2,6 +2,8 @@
 
 @section('content')
 <div class="container mt-8 py-5">
+@include('components.banners')
+
     <div class="row mb-4">
         <div class="col-12">
             <form method="GET" action="{{ route('companies.catalog') }}" class="card shadow-sm">
@@ -20,7 +22,6 @@
             </form>
         </div>
     </div>
-@include('components.banners')
     <div class="row">
         <!-- Фильтры слева -->
         <div class="col-md-3">

@@ -430,7 +430,7 @@
                         </li>
                         <li class="nav-item d-flex align-items-center mb-2">
                             <i class="fas fa-envelope me-2"></i>
-                            <a class="nav-link an-color p-0" href="https://t.me/textilserver_support">@textilserver_support</a>
+                            <a class="nav-link an-color p-0" href="https://t.me/textilserver_support">Техническая поддержка</a>
                         </li>
                         <li class="nav-item d-flex align-items-center mb-2">
                             <i class="fas fa-clock me-2"></i>
