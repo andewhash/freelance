@@ -37,7 +37,6 @@ class ProfileController extends Controller
 
     public function update(Request $request)
     {
-        
         $user = auth()->user();
         
         $validated = $request->validate([
@@ -53,8 +52,16 @@ class ProfileController extends Controller
             'city' => 'nullable|string|max:255',
             'contact_email' => 'nullable|email|max:255',
             'site' => 'nullable|url|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
         
+
+        if ($request->file('image')) {
+            $path = $request->file('image')->store('public/avatars');
+            auth()->user()->update(['image_url' => str_replace('public/', '', $path)]);
+        }
+        
+       
         $user->update($validated);
         
         return back()->with('success', 'Профиль успешно обновлен');

@@ -109,6 +109,12 @@
         background-color: #f8f9fa;
     }
 
+    .input-group.input-group-outline.is-focused .form-label+.form-control {
+        border-color:rgb(255, 255, 255) !important;
+        border-top-color: transparent !important;
+        box-shadow: inset 1px 0rgb(255, 255, 255), inset -1px 0rgb(238, 238, 238), inset 0 -1pxrgb(255, 255, 255) !important;
+    }
+
     .nav-item-catalog {
         position: relative;
     }
@@ -391,16 +397,6 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link an-color" href="mailto:info@textileserver.com" target="_blank">
-                                Контакты
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link an-color" href="/https://www.instagram.com/textilenetwork/" target="_blank">
-                                Блог
-                            </a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link an-color" href="/tarifs" target="_blank">
                                 Тарифы
                             </a>
@@ -421,7 +417,7 @@
                     <ul class="flex-column ms-n3 nav">
                         <li class="nav-item d-flex align-items-center mb-2">
                             <i class="fas fa-map-marker-alt me-2"></i>
-                            <span class="an-color">Москва, ул. Текстильная, 15</span>
+                            <span class="an-color">Москва, ул. текстильная, 15</span>
                         </li>
                         
                         <li class="nav-item d-flex align-items-center mb-2">
@@ -464,7 +460,6 @@
 </footer>
 <!-- Подключаем jQuery перед Select2 -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 
 <!-- Select2 JS -->
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>

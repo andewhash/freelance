@@ -21,6 +21,7 @@ use App\Enum\User\UserRoleEnum;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\RequestController;
 use App\Http\Controllers\Admin\ResponseController as AdminResponseController;
+use App\Http\Controllers\ReviewController;
 
 Route::get('/', [\App\Http\Controllers\MainController::class, 'index'])->name('home');
 // Auth Login|Register Pages
@@ -113,6 +114,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('seller.responses.images.destroy');
         Route::get('responses/{response}/images', [\App\Http\Controllers\Seller\ResponseController::class, 'getImages'])
             ->name('seller.responses.images');
+    });
+
+    // Отзывы
+    Route::prefix('reviews')->group(function () {
+        Route::get('/user/{user}/create', [ReviewController::class, 'create'])->name('reviews.create');
+        Route::post('/user/{user}', [ReviewController::class, 'store'])->name('reviews.store');
+        Route::get('/user/{user}', [ReviewController::class, 'getUserReviews'])->name('reviews.user');
     });
 });
 

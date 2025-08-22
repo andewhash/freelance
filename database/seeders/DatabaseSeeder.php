@@ -45,33 +45,33 @@ class DatabaseSeeder extends Seeder
 
          // Очищаем таблицы перед заполнением
         //  DB::table('users')->truncate();
-         DB::table('user_categories')->truncate();
+        //  DB::table('user_categories')->truncate();
  
-         $totalPages = ceil($this->totalCompanies / $this->limit);
+        //  $totalPages = ceil($this->totalCompanies / $this->limit);
  
-         for ($offset = 0; $offset < $this->totalCompanies; $offset += $this->limit) {
-             $url = $this->apiUrl . "?limit={$this->limit}&offset={$offset}&category_ids=0&country_ids=0&certificate_ids=0";
+        //  for ($offset = 0; $offset < $this->totalCompanies; $offset += $this->limit) {
+        //      $url = $this->apiUrl . "?limit={$this->limit}&offset={$offset}&category_ids=0&country_ids=0&certificate_ids=0";
              
-             $response = Http::get($url);
+        //      $response = Http::get($url);
  
-             if ($response->successful()) {
-                 $data = $response->json();
+        //      if ($response->successful()) {
+        //          $data = $response->json();
                  
-                 if (isset($data['items'])) {
-                     foreach ($data['items'] as $company) {
-                         $this->saveCompany($company);
-                     }
-                 }
+        //          if (isset($data['items'])) {
+        //              foreach ($data['items'] as $company) {
+        //                  $this->saveCompany($company);
+        //              }
+        //          }
  
-                 $this->command->info("Processed {$offset}/{$this->totalCompanies} companies");
-             } else {
-                 $this->command->error("Failed to fetch companies. Offset: {$offset}");
-                 Log::error('Failed to fetch companies', [
-                     'offset' => $offset,
-                     'response' => $response->body()
-                 ]);
-             }
-         }
+        //          $this->command->info("Processed {$offset}/{$this->totalCompanies} companies");
+        //      } else {
+        //          $this->command->error("Failed to fetch companies. Offset: {$offset}");
+        //          Log::error('Failed to fetch companies', [
+        //              'offset' => $offset,
+        //              'response' => $response->body()
+        //          ]);
+        //      }
+        //  }
  
          $this->command->info('All companies seeded successfully!');
     }

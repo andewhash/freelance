@@ -383,70 +383,80 @@ class MainController extends Controller
     }
 
     public function requestsCatalog()
-    {
-        $categoryIds = request('categories', []);
-        $countryIds = request('countries', []);
-        $searchQuery = request('search');
-        $breadcrumbs = [];
+{
+    $categoryIds = request('categories', []);
+    $countryIds = request('countries', []);
+    $searchQuery = request('search');
+    $breadcrumbs = [];
+    
+    $query = ModelRequest::query()
+        ->select('requests.*')
+        ->with(['categories', 'countries'])
+        ->join('users', 'requests.customer_id', '=', 'users.id')
+        ->orderBy('users.order_search', 'desc')
+        ->orderBy('requests.created_at', 'desc');
+    
+    $user = auth()->user();
+    $hasPremium = $user && $user->has_premium_subscription == 1;
+    if (!$hasPremium) {
+        $query->where('requests.created_at', '<=', now()->subHour());
+    }
+    
+    // Фильтр по категориям
+    if (!empty($categoryIds)) {
+        $query->whereHas('categories', function($q) use ($categoryIds) {
+            $q->whereIn('categories.id', $categoryIds);
+        });
+    }
+    
+    // Фильтр по странам
+    if (!empty($countryIds)) {
+        $query->whereHas('countries', function($q) use ($countryIds) {
+            $q->whereIn('countries.id', $countryIds);
+        });
+    }
+    
+    // Поиск
+    if ($searchQuery) {
+        $searchTerms = array_filter(explode(' ', $searchQuery));
         
-        $query = ModelRequest::query()->with('categories', 'countries');
-        $user = auth()->user();
-        $hasPremium = $user && $user->has_premium_subscription == 1;
-        if (!$hasPremium) {
-            $query->where('created_at', '<=', now()->subHour());
-        }    
-        // Фильтр по категориям (мультиселект)
-        if (!empty($categoryIds)) {
-            $query->whereHas('categories', function($q) use ($categoryIds) {
-                $q->whereIn('categories.id', $categoryIds);
-            });
-        }
-        
-        // Фильтр по странам (через связь many-to-many)
-        if (!empty($countryIds)) {
-            $query->whereHas('countries', function($q) use ($countryIds) {
-                $q->whereIn('countries.id', $countryIds);
-            });
-        }
-        
-        // Поиск по тексту или заголовку
-        // Улучшенный поиск
-        if ($searchQuery) {
-            $searchTerms = explode(' ', $searchQuery);
-            
+        if (!empty($searchTerms)) {
             $query->where(function($q) use ($searchTerms) {
                 foreach ($searchTerms as $term) {
-                    $q->where(function($subQuery) use ($term) {
-                        $subQuery->where('title', 'like', "%{$term}%")
-                                ->orWhere('description', 'like', "%{$term}%")
-                                ->orWhereHas('categories', function($catQuery) use ($term) {
-                                    $catQuery->where('name', 'like', "%{$term}%");
-                                })
-                                ->orWhereHas('countries', function($countryQuery) use ($term) {
-                                    $countryQuery->where('name', 'like', "%{$term}%");
-                                });
-                    });
+                    if (strlen($term) > 2) {
+                        $q->orWhere('requests.title', 'like', "%{$term}%")
+                        ->orWhere('requests.description', 'like', "%{$term}%")
+                        ->orWhereHas('categories', function($catQuery) use ($term) {
+                            $catQuery->where('name', 'like', "%{$term}%");
+                        })
+                        ->orWhereHas('countries', function($countryQuery) use ($term) {
+                            $countryQuery->where('name', 'like', "%{$term}%");
+                        })
+                        ->orWhereHas('user', function($userQuery) use ($term) {
+                            $userQuery->where('name', 'like', "%{$term}%");
+                        });
+                    }
                 }
             });
         }
-        
-        $requests = $query->paginate(12);
-        
-        $allCountries = Country::get(); // Или ваш источник данных по странам
-        $allCategories = Category::whereHas('parent', function($query) {
-            $query->whereHas('parent');
-        })->get();
-        
-        return view('requests.catalog', compact(
-            'requests', 
-            'allCountries', 
-            'allCategories',
-            'breadcrumbs',
-            'searchQuery',
-            'categoryIds',
-            'countryIds'
-        ));
     }
+    
+    $requests = $query->paginate(12);
+    
+    // Получаем иерархические категории
+    $allCategories = Category::getHierarchicalForCheckboxes();
+    $allCountries = Country::all();
+    
+    return view('requests.catalog', compact(
+        'requests', 
+        'allCountries', 
+        'allCategories',
+        'breadcrumbs',
+        'searchQuery',
+        'categoryIds',
+        'countryIds'
+    ));
+}
     public function requestsShow($orderId)
     {
         $order = ModelRequest::findOrFail($orderId);
@@ -463,34 +473,35 @@ class MainController extends Controller
         $breadcrumbs = [];
         
         $query = Response::query()
-            ->select('responses.*') // Явно указываем таблицу для избежания конфликтов
-            ->with('user', 'category', 'countries', 'images')
-            ->join('users', 'responses.user_id', '=', 'users.id') // Подключаем таблицу пользователей
-            ->orderBy('users.order_search', 'desc') // Сначала сортируем по order_search (чем больше - тем выше)
-            ->orderBy('responses.created_at', 'desc'); // Затем по дате создания (новые выше)
+            ->select('responses.*')
+            ->with(['user', 'categories', 'countries', 'images'])
+            ->join('users', 'responses.user_id', '=', 'users.id')
+            ->orderBy('users.order_search', 'desc')
+            ->orderBy('responses.created_at', 'desc');
         
-        // Фильтр по категориям (мультиселект)
+        // Фильтр по категориям
         if (!empty($categoryIds)) {
             $query->whereHas('categories', function($q) use ($categoryIds) {
                 $q->whereIn('categories.id', $categoryIds);
             });
         }
         
-        // Фильтр по странам (через связь many-to-many)
+        // Фильтр по странам
         if (!empty($countryIds)) {
             $query->whereHas('countries', function($q) use ($countryIds) {
                 $q->whereIn('countries.id', $countryIds);
             });
         }
         
-        // Поиск по тексту или заголовку
+        // Поиск
         if ($searchQuery) {
-            $searchTerms = explode(' ', $searchQuery);
+            $searchTerms = array_filter(explode(' ', $searchQuery));
             
-            $query->where(function($q) use ($searchTerms) {
-                foreach ($searchTerms as $term) {
-                    $q->where(function($subQuery) use ($term) {
-                        $subQuery->where('responses.title', 'like', "%{$term}%")
+            if (!empty($searchTerms)) {
+                $query->where(function($q) use ($searchTerms) {
+                    foreach ($searchTerms as $term) {
+                        if (strlen($term) > 2) {
+                            $q->orWhere('responses.title', 'like', "%{$term}%")
                             ->orWhere('responses.text', 'like', "%{$term}%")
                             ->orWhereHas('categories', function($catQuery) use ($term) {
                                 $catQuery->where('name', 'like', "%{$term}%");
@@ -501,17 +512,17 @@ class MainController extends Controller
                             ->orWhereHas('user', function($userQuery) use ($term) {
                                 $userQuery->where('name', 'like', "%{$term}%");
                             });
-                    });
-                }
-            });
+                        }
+                    }
+                });
+            }
         }
         
         $responses = $query->paginate(12);
         
-        $allCountries = Country::get();
-        $allCategories = Category::whereHas('parent', function($query) {
-            $query->whereHas('parent');
-        })->get();
+        // Получаем иерархические категории
+        $allCategories = Category::getHierarchicalForCheckboxes();
+        $allCountries = Country::all();
         
         return view('responses.catalog', compact(
             'responses', 

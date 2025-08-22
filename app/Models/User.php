@@ -100,4 +100,28 @@ class User extends Authenticatable
 //        'seller_id', 'customer_id'
         return $this->hasMany(Order::class, $this->role == UserRoleEnum::SELLER ? 'seller_id' : "customer_id");
     }
+
+    // Отзывы, оставленные пользователем
+    public function reviewsGiven()
+    {
+        return $this->hasMany(Review::class, 'author_id');
+    }
+
+    // Отзывы, полученные пользователем
+    public function reviewsReceived()
+    {
+        return $this->hasMany(Review::class, 'recipient_id');
+    }
+
+    // Средний рейтинг пользователя
+    public function getAverageRatingAttribute()
+    {
+        return $this->reviewsReceived()->avg('rating') ?: 0;
+    }
+
+    // Количество отзывов
+    public function getReviewsCountAttribute()
+    {
+        return $this->reviewsReceived()->count();
+    }
 }

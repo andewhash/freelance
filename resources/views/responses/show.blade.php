@@ -62,7 +62,7 @@
                         <h3 class="h4 mb-3">Детали предложения</h3>
                         <div class="row">
                             <div class="col-md-6">
-                                <p><strong>Количество:</strong> {{ $response->count }} шт.</p>
+                                <p><strong>Стоимость:</strong> {{ $response->count }} ₽.</p>
                             </div>
                             <div class="col-md-6">
                                 <p><strong>Дата публикации:</strong> {{ $response->created_at->format('d.m.Y H:i') }}</p>
@@ -95,6 +95,15 @@
                              height="100" 
                              alt="{{ $response->user->name }}">
                         <h3 class="h5">{{ $response->user->name }}</h3>
+                        @if($response->user->reviews_count > 0)
+                    <div class="user-rating">
+                        <small class="text-muted">
+                            ⭐ {{ number_format($response->user->average_rating, 1) }} ({{ $response->user->reviews_count }} отзывов)
+                        </small>
+                    </div>
+                    @else
+                    <small class="text-muted">Нет отзывов</small>
+                    @endif
                         
                         @if($response->user->brand)
                         <p class="text-muted">{{ $response->user->brand }}</p>
@@ -190,6 +199,17 @@
                             <i class="fas fa-envelope me-2"></i> Написать сообщение (ДЕМО)
                         </button>
                         @endif
+@include('reviews.modal', ['user' => $response->user])
+
+                        @auth
+    @if(Auth::id() != $response->user->id)
+    <button type="button" class="btn btn-primary btn-sm" 
+            data-bs-toggle="modal" data-bs-target="#reviewModal"
+            onclick="loadReviewModal({{ $response->user->id }})">
+        <i class="fas fa-star"></i> Оставить отзыв
+    </button>
+    @endif
+@endauth
 
                         {{-- <button class="btn btn-outline-secondary">
                             <i class="fas fa-heart me-2"></i> Добавить в избранное

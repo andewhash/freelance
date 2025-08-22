@@ -19,8 +19,8 @@
                             Откройте новую жизнь в мире оптового маркетплейса. Работайте с дома через безопасные сделки и используйте функции ИИ для улучшения ваших продаж
                         </p>
                         <div class="d-flex align-items-center mb-4">
-                            <div class="avatar-group">
-                                <a href="javascript:;" class="avatar avatar-sm rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" aria-label="Martin Doe" data-bs-original-title="Martin Doe">
+                            <!-- <div class="avatar-group"> -->
+                                <!-- <a href="javascript:;" class="avatar avatar-sm rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" aria-label="Martin Doe" data-bs-original-title="Martin Doe">
                                     <img alt="Image placeholder" src="https://demos.creative-tim.com/material-dashboard-pro/assets/img/bruce-mars.jpg">
                                 </a>
                                 <a href="javascript:;" class="avatar avatar-sm rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" aria-label="Romina Hadid" data-bs-original-title="Romina Hadid">
@@ -28,9 +28,9 @@
                                 </a>
                                 <a href="javascript:;" class="avatar avatar-sm rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" aria-label="Alexa Tompson" data-bs-original-title="Alexa Tompson">
                                     <img alt="Image placeholder" src="https://demos.creative-tim.com/material-dashboard-pro/assets/img/team-3.jpg">
-                                </a>
-                            </div>
-                            <p class="mb-0 ms-2"> 3,500+  Продавцов</p>
+                                </a> -->
+                            <!-- </div> -->
+                            <p class="mb-0"> 3,500+  Продавцов</p>
                         </div>
                         <div class="d-block d-md-flex" style="gap: 10px;">
 
@@ -256,8 +256,6 @@
 <!-- Секция последних объявлений -->
 <section id="latest-ads" class="py-2 bg-light"  style="margin-top: 20px; border-radius: 8px">
     <div class="container">
-        @include('components.banners')
-
         <div class="row py-4 mb-6 text-center">
             <div class="col-lg-8 mx-auto">
                 <h5 class="text-primary fw-bold text-uppercase primary-text-color">Свежие предложения</h5>
@@ -335,7 +333,7 @@
 
         @if($latestResponses->count() > 0)
             <div class="text-center mt-4">
-                <a href="{{ route('responses.catalog') }}" class="btn btn-outline-primary">
+                <a href="{{ route('responses.catalog') }}" class="btn btn-primary">
                     Смотреть все объявления
                 </a>
             </div>

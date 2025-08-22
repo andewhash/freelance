@@ -113,7 +113,7 @@
                                 @endphp
                                 
                                 <div class="phone-verification">
-                                    <p>Для подтверждения телефона <strong>{{ Auth::user()->phone }}</strong>, пожалуйста, позвоните на номер:</p>
+                                    <p>Для подтверждения телефона <strong>{{ Auth::user()->phone }}</strong>, пожалуйста, позвоните на номер, <span class="text-success">звокон асболютно бесплатный</span>:</p>
                                     <h3>{{ $phoneToCall }}</h3>
                                     
                                     <form method="POST" action="{{ route('verify.phone') }}">

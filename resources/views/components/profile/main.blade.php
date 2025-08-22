@@ -6,7 +6,7 @@
         <h6 class="mb-0">Основные данные</h6>
     </div>
     <div class="card-body pt-0">
-        <form action="{{ route('profile.update') }}" method="POST">
+        <form action="{{ route('profile.update') }}" method="POST" enctype='multipart/form-data'>
             @csrf
             <div class="row">
                 <div class="col-md-6">

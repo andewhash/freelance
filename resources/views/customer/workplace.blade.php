@@ -120,162 +120,304 @@
             </div>
         </div>
     </div>
-
-    <!-- Modal для создания запроса -->
-    <div class="modal fade" id="createRequestModal" tabindex="-1" aria-labelledby="createRequestModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <form action="{{ route('customer.requests.store') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="createRequestModalLabel">Создать запрос</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="input-group input-group-static mb-4 @error('title') is-invalid @enderror">
-                                    <label for="title">Название *</label>
-                                    <input type="text" class="form-control" name="title" id="title" value="{{ old('title') }}" required>
-                                    @error('title')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+<!-- Modal для создания запроса -->
+<div class="modal fade" id="createRequestModal" tabindex="-1" aria-labelledby="createRequestModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <form action="{{ route('customer.requests.store') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createRequestModalLabel">Создать запрос</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="input-group input-group-static mb-4 @error('title') is-invalid @enderror">
+                                <label for="title">Название *</label>
+                                <input type="text" class="form-control" name="title" id="title" value="{{ old('title') }}" required>
+                                @error('title')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            
+                            <div class="input-group input-group-static mb-4 @error('description') is-invalid @enderror">
+                                <label for="description">Описание *</label>
+                                <textarea class="form-control" name="description" id="description-input" rows="3" required>{{ old('description') }}</textarea>
+                                <div class="d-flex justify-content-end mt-2">
+                                    <button type="button" id="generate-text-btn" class="btn btn-sm main-btn-active" disabled>
+                                        <span id="generate-text-label">Спросить ИИ</span>
+                                        <span id="generate-text-spinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
+                                    </button>
                                 </div>
-                                
-                                <div class="input-group input-group-static mb-4 @error('description') is-invalid @enderror">
-                                    <label for="description">Описание *</label>
-                                    <textarea class="form-control" name="description" id="description-input" rows="3" required>{{ old('description') }}</textarea>
-                                    <div class="d-flex justify-content-end mt-2">
-                                        <button type="button" id="generate-text-btn" class="btn btn-sm main-btn-active" disabled>
-                                            <span id="generate-text-label">Спросить ИИ</span>
-                                            <span id="generate-text-spinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
-                                        </button>
+                                @error('description')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- Блок стран -->
+                            <div style="display: flex; flex-direction: column;" class="input-group input-group-static mb-4 @error('countries') is-invalid @enderror">
+                                <label for="countries">Страны *</label>
+                                <select class="form-control select2" name="countries[]" id="countries" multiple required>
+                                    @foreach(\App\Models\Country::all() as $country)
+                                        <option value="{{ $country->id }}" @if(in_array($country->id, old('countries', []))) selected @endif>{{ $country->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('countries')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Блок категорий с чекбоксами -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="input-group input-group-static mb-3 @error('categories') is-invalid @enderror">
+                                <label>Категории *</label>
+                                <div class="categories-container" style="max-height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.375rem; padding: 15px;">
+                                    <div class="row">
+                                        @php
+                                            $categories = \App\Models\Category::getHierarchicalForCheckboxes();
+                                        @endphp
+                                        
+                                        @foreach($categories as $category)
+                                            <div class="col-md-4 mb-3">
+                                                <div class="category-level-0 fw-bold mb-2">
+                                                    {{ $category['name'] }}
+                                                </div>
+                                                
+                                                @if(isset($category['children']))
+                                                    @foreach($category['children'] as $subCategory)
+                                                        <div class="category-level-1 ps-3 mb-2">
+                                                            
+                                                            @if(isset($subCategory['children']) && count($subCategory['children']) > 0)
+                                                                <!-- Есть дочерние категории - показываем как заголовок -->
+                                                                <div class="fw-semibold text-muted">
+                                                                    {{ $subCategory['name'] }}
+                                                                </div>
+                                                                
+                                                                @foreach($subCategory['children'] as $childCategory)
+                                                                    <div class="category-level-2 ps-4 mb-1">
+                                                                        <div class="form-check">
+                                                                            <input class="form-check-input category-checkbox" 
+                                                                                   type="checkbox" 
+                                                                                   name="categories[]" 
+                                                                                   value="{{ $childCategory['id'] }}"
+                                                                                   id="category_{{ $childCategory['id'] }}"
+                                                                                   @if(in_array($childCategory['id'], old('categories', []))) checked @endif>
+                                                                            <label class="form-check-label" for="category_{{ $childCategory['id'] }}">
+                                                                                {{ $childCategory['name'] }}
+                                                                            </label>
+                                                                        </div>
+                                                                    </div>
+                                                                @endforeach
+                                                            @else
+                                                                <!-- Нет дочерних категорий - показываем как чекбокс -->
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input category-checkbox" 
+                                                                           type="checkbox" 
+                                                                           name="categories[]" 
+                                                                           value="{{ $subCategory['id'] }}"
+                                                                           id="category_{{ $subCategory['id'] }}"
+                                                                           @if(in_array($subCategory['id'], old('categories', []))) checked @endif>
+                                                                    <label class="form-check-label fw-semibold" for="category_{{ $subCategory['id'] }}">
+                                                                        {{ $subCategory['name'] }}
+                                                                    </label>
+                                                                </div>
+                                                            @endif
+                                                            
+                                                        </div>
+                                                    @endforeach
+                                                @else
+                                                    <!-- Если у корневой категории нет подкатегорий -->
+                                                    <div class="category-level-1 ps-3 mb-2">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input category-checkbox" 
+                                                                   type="checkbox" 
+                                                                   name="categories[]" 
+                                                                   value="{{ $category['id'] }}"
+                                                                   id="category_{{ $category['id'] }}"
+                                                                   @if(in_array($category['id'], old('categories', []))) checked @endif>
+                                                            <label class="form-check-label" for="category_{{ $category['id'] }}">
+                                                                {{ $category['name'] }}
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        @endforeach
                                     </div>
-                                    @error('description')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
                                 </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div style="display: flex; flex-direction: column;" class="input-group input-group-static mb-4 @error('categories') is-invalid @enderror">
-                                    <label for="categories">Категории *</label>
-                                    <select class="form-control select2" name="categories[]" id="categories" multiple required>
-                                        @foreach(\App\Models\Category::whereHas('parent', function($query) {
-    $query->whereHas('parent'); // Только категории с parent->parent
-})->get() as $category)
-                                            <option value="{{ $category->id }}" @if(in_array($category->id, old('categories', []))) selected @endif>{{ $category->name }}</option>
-                                        @endforeach
-                                    </select>
-                                    @error('categories')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                                
-                                <div style="display: flex; flex-direction: column;" class="input-group input-group-static mb-4 @error('countries') is-invalid @enderror">
-                                    <label for="countries">Страны *</label>
-                                    <select class="form-control select2" name="countries[]" id="countries" multiple required>
-                                        @foreach(\App\Models\Country::all() as $country)
-                                            <option value="{{ $country->id }}" @if(in_array($country->id, old('countries', []))) selected @endif>{{ $country->name }}</option>
-                                        @endforeach
-                                    </select>
-                                    @error('countries')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="input-group input-group-static mb-4 @error('images') is-invalid @enderror">
-                                    <label for="images">Изображения</label>
-                                    <input type="file" class="form-control" name="images[]" id="images" multiple>
-                                    @error('images')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
+                                @error('categories')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-another-primary" data-bs-dismiss="modal">Закрыть</button>
-                        <button type="submit" id="submit-btn-create" class="btn main-btn-active">Создать</button>
+                    
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="input-group input-group-static mb-4 @error('images') is-invalid @enderror">
+                                <label for="images">Изображения</label>
+                                <input type="file" class="form-control" name="images[]" id="images" multiple>
+                                @error('images')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
                     </div>
-                </form>
-            </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-another-primary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="submit" id="submit-btn-create" class="btn main-btn-active">Создать</button>
+                </div>
+            </form>
         </div>
     </div>
-
+</div>
     <!-- Modal для редактирования запроса -->
-    <div class="modal fade" id="editRequestModal" tabindex="-1" aria-labelledby="editRequestModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <form action="{{ route('customer.requests.update', 'request_id') }}" method="POST" id="editRequestForm" enctype="multipart/form-data">
-                    @csrf
-                    @method('PUT')
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editRequestModalLabel">Редактировать запрос</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="input-group input-group-static mb-4">
-                                    <label for="editTitle">Название *</label>
-                                    <input type="text" class="form-control" name="title" id="editTitle" required>
-                                </div>
-                                
-                                <div class="input-group input-group-static mb-4">
-                                    <label for="editDescription">Описание *</label>
-                                    <textarea class="form-control" name="description" id="editDescription" rows="3" required></textarea>
-                                </div>
+<div class="modal fade" id="editRequestModal" tabindex="-1" aria-labelledby="editRequestModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <form action="{{ route('customer.requests.update', 'request_id') }}" method="POST" id="editRequestForm" enctype="multipart/form-data">
+                @csrf
+                @method('PUT')
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editRequestModalLabel">Редактировать запрос</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="input-group input-group-static mb-4">
+                                <label for="editTitle">Название *</label>
+                                <input type="text" class="form-control" name="title" id="editTitle" required>
                             </div>
-                            <div class="col-md-6">
-                                <div style="display: flex; flex-direction: column;" class="input-group input-group-static mb-4">
-                                    <label for="editCategories">Категории *</label>
-                                    <select class="form-control select2" name="categories[]" id="editCategories" multiple required>
-                                        @foreach(\App\Models\Category::whereHas('parent', function($query) {
-    $query->whereHas('parent'); // Только категории с parent->parent
-})->get() as $category)
-                                            <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                
-                                <div style="display: flex; flex-direction: column;" class="input-group input-group-static mb-4">
-                                    <label for="editCountries">Страны *</label>
-                                    <select class="form-control select2" name="countries[]" id="editCountries" multiple required>
-                                        @foreach(\App\Models\Country::all() as $country)
-                                            <option value="{{ $country->id }}">{{ $country->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
+                            
+                            <div class="input-group input-group-static mb-4">
+                                <label for="editDescription">Описание *</label>
+                                <textarea class="form-control" name="description" id="editDescription" rows="3" required></textarea>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="input-group input-group-static mb-4">
-                                    <label for="editImages">Добавить изображения</label>
-                                    <input type="file" class="form-control" name="images[]" id="editImages" multiple>
-                                </div>
-                                
-                                <div class="current-images">
-                                    <h6 class="mb-3">Текущие изображения:</h6>
-                                    <div class="d-flex flex-wrap" id="currentImagesContainer">
-                                        <!-- Здесь будут отображаться текущие изображения -->
+                        <div class="col-md-6">
+                            <!-- Блок стран -->
+                            <div style="display: flex; flex-direction: column;" class="input-group input-group-static mb-4">
+                                <label for="editCountries">Страны *</label>
+                                <select class="form-control select2" name="countries[]" id="editCountries" multiple required>
+                                    @foreach(\App\Models\Country::all() as $country)
+                                        <option value="{{ $country->id }}">{{ $country->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Блок категорий с чекбоксами -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="input-group input-group-static mb-3">
+                                <label>Категории *</label>
+                                <div class="categories-container" style="max-height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.375rem; padding: 15px;">
+                                    <div class="row" id="editCategoriesContainer">
+                                        @php
+                                            $categories = \App\Models\Category::getHierarchicalForCheckboxes();
+                                        @endphp
+                                        
+                                        @foreach($categories as $category)
+                                            <div class="col-md-4 mb-3">
+                                                <div class="category-level-0 fw-bold mb-2">
+                                                    {{ $category['name'] }}
+                                                </div>
+                                                
+                                                @if(isset($category['children']))
+                                                    @foreach($category['children'] as $subCategory)
+                                                        <div class="category-level-1 ps-3 mb-2">
+                                                            
+                                                            @if(isset($subCategory['children']) && count($subCategory['children']) > 0)
+                                                                <!-- Есть дочерние категории - показываем как заголовок -->
+                                                                <div class="fw-semibold text-muted">
+                                                                    {{ $subCategory['name'] }}
+                                                                </div>
+                                                                
+                                                                @foreach($subCategory['children'] as $childCategory)
+                                                                    <div class="category-level-2 ps-4 mb-1">
+                                                                        <div class="form-check">
+                                                                            <input class="form-check-input category-checkbox" 
+                                                                                   type="checkbox" 
+                                                                                   name="categories[]" 
+                                                                                   value="{{ $childCategory['id'] }}"
+                                                                                   id="edit_category_{{ $childCategory['id'] }}">
+                                                                            <label class="form-check-label" for="edit_category_{{ $childCategory['id'] }}">
+                                                                                {{ $childCategory['name'] }}
+                                                                            </label>
+                                                                        </div>
+                                                                    </div>
+                                                                @endforeach
+                                                            @else
+                                                                <!-- Нет дочерних категорий - показываем как чекбокс -->
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input category-checkbox" 
+                                                                           type="checkbox" 
+                                                                           name="categories[]" 
+                                                                           value="{{ $subCategory['id'] }}"
+                                                                           id="edit_category_{{ $subCategory['id'] }}">
+                                                                    <label class="form-check-label fw-semibold" for="edit_category_{{ $subCategory['id'] }}">
+                                                                        {{ $subCategory['name'] }}
+                                                                    </label>
+                                                                </div>
+                                                            @endif
+                                                            
+                                                        </div>
+                                                    @endforeach
+                                                @else
+                                                    <!-- Если у корневой категории нет подкатегорий -->
+                                                    <div class="category-level-1 ps-3 mb-2">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input category-checkbox" 
+                                                                   type="checkbox" 
+                                                                   name="categories[]" 
+                                                                   value="{{ $category['id'] }}"
+                                                                   id="edit_category_{{ $category['id'] }}">
+                                                            <label class="form-check-label" for="edit_category_{{ $category['id'] }}">
+                                                                {{ $category['name'] }}
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        @endforeach
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-another-primary" data-bs-dismiss="modal">Закрыть</button>
-                        <button type="submit" class="btn main-btn-active">Сохранить изменения</button>
+                    
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="input-group input-group-static mb-4">
+                                <label for="editImages">Добавить изображения</label>
+                                <input type="file" class="form-control" name="images[]" id="editImages" multiple>
+                            </div>
+                            
+                            <div class="current-images">
+                                <h6 class="mb-3">Текущие изображения:</h6>
+                                <div class="d-flex flex-wrap" id="currentImagesContainer">
+                                    <!-- Здесь будут отображаться текущие изображения -->
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </form>
-            </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-another-primary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="submit" class="btn main-btn-active">Сохранить изменения</button>
+                </div>
+            </form>
         </div>
     </div>
-
+</div>
     <!-- Modal для откликов -->
     <div class="modal fade" id="responsesModal" tabindex="-1" aria-labelledby="responsesModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
@@ -414,9 +556,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const button = event.relatedTarget;
         const id = button.getAttribute('data-id');
         const title = button.getAttribute('data-title');
+        const description = button.getAttribute('data-description');
         const categories = JSON.parse(button.getAttribute('data-categories'));
         const countries = JSON.parse(button.getAttribute('data-countries'));
-        const description = button.getAttribute('data-description');
 
         const form = document.getElementById('editRequestForm');
         form.action = form.action.replace('request_id', id);
@@ -424,8 +566,17 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('editTitle').value = title;
         document.getElementById('editDescription').value = description;
         
-        // Устанавливаем выбранные категории
-        $('#editCategories').val(categories).trigger('change');
+        // Устанавливаем выбранные страны
+        $('#editCountries').val(countries).trigger('change');
+        
+        // Отмечаем выбранные категории в чекбоксах
+        categories.forEach(categoryId => {
+            const checkbox = document.getElementById(`edit_category_${categoryId}`);
+            if (checkbox) {
+                checkbox.checked = true;
+            }
+        });
+
         
         // Устанавливаем выбранные страны
         $('#editCountries').val(countries).trigger('change');

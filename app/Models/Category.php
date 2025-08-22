@@ -55,4 +55,65 @@ class Category extends Model
         
         return $ancestors;
     }
+
+    
+
+    // НОВЫЙ МЕТОД: Получить все категории с иерархией
+    public static function getAllWithHierarchy()
+    {
+        return self::with(['children.children'])
+            ->whereNull('parent_id')
+            ->get()
+            ->map(function($category) {
+                return self::formatForSelect($category);
+            });
+    }
+
+    // НОВЫЙ МЕТОД: Форматирование для select
+    protected static function formatForSelect($category, $level = 0)
+    {
+        $formatted = [
+            'id' => $category->id,
+            'name' => $category->name,
+            'level' => $level
+        ];
+
+        if ($category->children->isNotEmpty()) {
+            $formatted['children'] = $category->children->map(function($child) use ($level) {
+                return self::formatForSelect($child, $level + 1);
+            });
+        }
+
+        return $formatted;
+    }
+    // В классе Category добавьте этот метод
+public static function getHierarchicalForCheckboxes()
+{
+    return self::with(['children.children'])
+        ->whereNull('parent_id')
+        ->get()
+        ->map(function($category) {
+            return self::formatForCheckboxes($category);
+        });
+}
+
+// И этот вспомогательный метод
+protected static function formatForCheckboxes($category, $level = 0)
+{
+    $formatted = [
+        'id' => $category->id,
+        'name' => $category->name,
+        'level' => $level,
+        'has_children' => $category->children->isNotEmpty(),
+        'is_selectable' => $level == 2 // Только третий уровень можно выбирать
+    ];
+
+    if ($category->children->isNotEmpty()) {
+        $formatted['children'] = $category->children->map(function($child) use ($level) {
+            return self::formatForCheckboxes($child, $level + 1);
+        });
+    }
+
+    return $formatted;
+}
 }

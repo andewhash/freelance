@@ -22,8 +22,8 @@ class ResponseController extends Controller
             ->orderByDesc('id')
             ->get()
             ->sortByDesc('created_at');
-
-        return view('seller.workplace', compact('responses'));
+        $categories = Category::getAllWithHierarchy();
+        return view('seller.workplace', compact('responses', 'categories'));
     }
 
     public function store(Request $request)

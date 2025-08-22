@@ -82,6 +82,16 @@
                              height="100" 
                              alt="{{ $order->user->name }}">
                         <h3 class="h5">{{ $order->user->name }}</h3>
+
+                        @if($order->user->reviews_count > 0)
+                        <div class="user-rating">
+                            <small class="text-muted">
+                                ⭐ {{ number_format($order->user->average_rating, 1) }} ({{ $order->user->reviews_count }} отзывов)
+                            </small>
+                        </div>
+                        @else
+                        <small class="text-muted">Нет отзывов</small>
+                        @endif
                         
                         @if($order->user->brand)
                         <p class="text-muted">{{ $order->user->brand }}</p>
@@ -156,6 +166,17 @@
                             <i class="fas fa-envelope me-2"></i> Написать сообщение (ДЕМО)
                         </button>
                         @endif
+@include('reviews.modal', ['user' => $order->user])
+
+                        @auth
+                            @if(Auth::id() != $order->user->id)
+                            <button type="button" class="btn btn-primary btn-sm" 
+                                    data-bs-toggle="modal" data-bs-target="#reviewModal"
+                                    onclick="loadReviewModal({{ $order->user->id }})">
+                                <i class="fas fa-star"></i> Оставить отзыв
+                            </button>
+                            @endif
+                        @endauth
                         {{-- <button class="btn btn-outline-secondary">
                             <i class="fas fa-heart me-2"></i> Добавить в избранное
                         </button> --}}
