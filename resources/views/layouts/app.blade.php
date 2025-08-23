@@ -475,6 +475,7 @@
 <script src="/assets/js/material-dashboard.min.js?v=3.2.0" type="text/javascript"></script>
 <script type="text/javascript">
   $(document).ready(function() {
+    
     $('.select2').select2({
             placeholder: "Выберите значения",
             allowClear: true,
@@ -485,6 +486,7 @@
             theme: "bootstrap-5" // Используем тему, совместимую с Bootstrap 5
         });
     });
+
 
     
     // Авто-отправка формы при изменении фильтров

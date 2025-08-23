@@ -83,122 +83,14 @@
 @endsection
 
 @push('scripts')
-<script>
-$(document).ready(function() {
-    let currentChatId = {{ $activeChat->id ?? 'null' }};
-    let isLoading = false;
-    let chatsOffset = {{ count($chats) }};
-    let messagesOffset = {{ $activeChat ? count($messages) : 0 }};
+<script src="/js/echo.js"></script>
 
-    // Обработчик загрузки дополнительных чатов
-    $('.load-more-chats').click(function() {
-        if (isLoading) return;
-        
-        isLoading = true;
-        $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Загрузка...');
-        
-        $.get('{{ route("profile.chats.loadMore") }}', { offset: chatsOffset }, function(data) {
-            if (data.length > 0) {
-                chatsOffset += data.length;
-                renderChats(data);
-            } else {
-                $('.load-more-chats').hide();
-            }
-        }).always(function() {
-            isLoading = false;
-            $('.load-more-chats').prop('disabled', false).text('Загрузить еще');
-        });
-    });
-    
-    // Обработчик выбора чата
-    $(document).on('click', '.chat-item', function(e) {
-        e.preventDefault();
-        const chatId = $(this).data('chat-id');
-        if (currentChatId === chatId) return;
-        
-        currentChatId = chatId;
-        $('.chat-item').removeClass('active');
-        $(this).addClass('active');
-        loadChat(chatId);
-    });
-    
-    // Обработчик отправки сообщения
-    $('.send-message').click(function() {
-        const message = $('.message-input textarea').val().trim();
-        if (message && currentChatId) {
-            $.post('/profile/chats/' + currentChatId + '/send/', {
-                message: message,
-                _token: '{{ csrf_token() }}'
-            }, function(response) {
-                if (response.success) {
-                    $('.message-input textarea').val('');
-                    appendMessage(response.message);
-                }
-            });
-        }
-    });
-    
-    // Функция загрузки чата
-    function loadChat(chatId) {
-        $.get('{{ route("profile.chats.getChat", "") }}/' + chatId, function(data) {
-            $('.chat-container .card-header h5').text('Чат с ' + data.chat.partner_name);
-            
-            let messagesHtml = '';
-            if (data.messages.length > 0) {
-                data.messages.forEach(message => {
-                    messagesHtml += renderMessage(message);
-                });
-            } else {
-                messagesHtml = '<p class="text-center">Нет сообщений</p>';
-            }
-            
-            $('.messages-container').html(messagesHtml);
-            $('.message-input').show();
-            scrollToBottom();
-        });
-    }
-    
-    // Функция рендера чатов
-    function renderChats(chats) {
-        let html = '';
-        chats.forEach(chat => {
-            html += `
-                <li class="list-group-item chat-item" data-chat-id="${chat.id}">
-                    <a href="#" class="text-decoration-none">
-                        ${chat.seller_id == {{ auth()->id() }} ? chat.customer.name : chat.seller.name}
-                    </a>
-                    ${chat.has_unread ? '<span class="badge bg-primary float-end"><i class="fas fa-check"></i></span>' : ''}
-                    <p class="text-muted small mb-0">${chat.latest_message ? chat.latest_message.message.substring(0, 30) + (chat.latest_message.message.length > 30 ? '...' : '') : 'Напишите первое сообщение...'}</p>
-                    <p class="text-muted small mb-0">${chat.latest_message ? chat.latest_message.created_at : ''}</p>
-                </li>
-            `;
-        });
-        $('.chats-list ul').append(html);
-    }
-    
-    // Функция рендера сообщения
-    function renderMessage(message) {
-        const isMe = message.user_id == {{ auth()->id() }};
-        return `
-            <div class="message ${isMe ? 'text-end' : 'text-start'} mb-3">
-                <div class="d-inline-block p-2 rounded ${isMe ? 'bg-primary text-white' : 'bg-light'}">
-                    ${message.message}
-                    <div class="text-muted small">${message.created_at}</div>
-                </div>
-            </div>
-        `;
-    }
-    
-    // Функция добавления сообщения
-    function appendMessage(message) {
-        $('.messages-container').append(renderMessage(message));
-        scrollToBottom();
-    }
-    
-    // Функция прокрутки вниз
-    function scrollToBottom() {
-        $('.messages-container').scrollTop($('.messages-container')[0].scrollHeight);
-    }
-});
+<script>
+    window.authId = {{ auth()->id() }};
+    window.activeChatId = {{ $activeChat->id ?? 'null' }};
+    window.initialChatsCount = {{ count($chats) }};
+    window.initialMessagesCount = {{ $activeChat ? count($messages) : 0 }};
 </script>
+<script type="module"  src="/assets/js/chats.js"></script>
+
 @endpush

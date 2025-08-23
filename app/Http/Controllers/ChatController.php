@@ -6,7 +6,7 @@ use App\Models\Chat;
 use App\Models\ChatMessage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
+use App\Events\MessageSent;
 class ChatController extends Controller
 {
     const CHATS_PER_PAGE = 5;
@@ -51,6 +51,7 @@ class ChatController extends Controller
         $chat = Chat::firstOrCreate([
             'seller_id' => $request->seller_id,
             'customer_id' => $request->customer_id,
+            'order_id' => 1
         ]);
 
         return response()->json(['chat_id' => $chat->id]);
@@ -68,6 +69,9 @@ class ChatController extends Controller
             'user_id' => Auth::id(),
             'message' => $request->message,
         ]);
+
+        broadcast(new MessageSent($chat->id));
+
 
         $chat->touch();
 

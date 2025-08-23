@@ -13,6 +13,12 @@ use Illuminate\Support\Facades\Broadcast;
 |
 */
 
-Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
-    return (int) $user->id === (int) $id;
+
+Broadcast::channel('chat.{chatId}', function ($user, $chatId) {
+    // Проверяем, что пользователь является участником чата
+    return \App\Models\Chat::where('id', $chatId)
+        ->where(function($query) use ($user) {
+            $query->where('seller_id', $user->id)
+                  ->orWhere('customer_id', $user->id);
+        })->exists();
 });
