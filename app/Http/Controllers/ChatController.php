@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Events\MessageSent;
 class ChatController extends Controller
 {
-    const CHATS_PER_PAGE = 5;
+    const CHATS_PER_PAGE = 30;
     const MESSAGES_PER_PAGE = 20;
 
     public function index()
@@ -22,7 +22,6 @@ class ChatController extends Controller
                       ->orWhere('customer_id', $user->id);
             })
             ->orderByDesc('updated_at')
-            ->limit(self::CHATS_PER_PAGE)
             ->get();
 
         // Загружаем сообщения для первого чата, если есть
@@ -33,7 +32,6 @@ class ChatController extends Controller
             $messages = $activeChat->messages()
                 ->with('user')
                 ->orderByDesc('created_at')
-                ->limit(self::MESSAGES_PER_PAGE)
                 ->get()
                 ->reverse();
         }
@@ -70,7 +68,7 @@ class ChatController extends Controller
             'message' => $request->message,
         ]);
 
-        broadcast(new MessageSent($chat->id));
+        // broadcast(new MessageSent($chat->id));
 
 
         $chat->touch();
@@ -101,7 +99,6 @@ class ChatController extends Controller
             })
             ->orderByDesc('updated_at')
             ->offset($offset)
-            ->limit(self::CHATS_PER_PAGE)
             ->get();
 
         return response()->json($chats);
@@ -121,14 +118,39 @@ class ChatController extends Controller
         return response()->json($messages);
     }
 
-    public function getChat(Chat $chat)
+    // В ChatController.php добавить:
+public function getNewMessages(Chat $chat, Request $request)
+{
+    // Проверяем доступ
+    if ($chat->seller_id != auth()->id() && $chat->customer_id != auth()->id()) {
+        abort(403);
+    }
+
+    $lastId = $request->input('last_id', 0);
+    
+    $messages = $chat->messages()
+        ->with('user')
+        ->where('id', '>', $lastId)
+        ->orderBy('created_at')
+        ->get();
+
+    return response()->json($messages);
+}
+
+   public function getChat(Chat $chat)
     {
+        // Проверяем, что пользователь имеет доступ к чату
+        if ($chat->seller_id != auth()->id() && $chat->customer_id != auth()->id()) {
+            abort(403);
+        }
+
         $messages = $chat->messages()
             ->with('user')
             ->orderByDesc('created_at')
             ->limit(self::MESSAGES_PER_PAGE)
             ->get()
-            ->reverse();
+            ->reverse()
+            ->values(); // Преобразуем в массив с числовыми ключами
 
         return response()->json([
             'chat' => [
@@ -140,7 +162,7 @@ class ChatController extends Controller
                     ? $chat->customer->id
                     : $chat->seller->id
             ],
-            'messages' => $messages
+            'messages' => $messages // Теперь это точно массив
         ]);
     }
 }

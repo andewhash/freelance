@@ -22,6 +22,10 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\RequestController;
 use App\Http\Controllers\Admin\ResponseController as AdminResponseController;
 use App\Http\Controllers\ReviewController;
+use App\Events\TestWebEvent;
+Route::get('/web-test', function() {
+    event(new TestWebEvent);
+});
 
 Route::get('/', [\App\Http\Controllers\MainController::class, 'index'])->name('home');
 // Auth Login|Register Pages
@@ -90,6 +94,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Chats
     Route::prefix('profile/chats')->group(function () {
+        Route::get('/{chat}/new-messages', [ChatController::class, 'getNewMessages'])
+    ->name('profile.chats.newMessages');
         Route::get('/', [ChatController::class, 'index'])->name('profile.chats');
         Route::post('/', [ChatController::class, 'store'])->name('profile.chats.store');
         Route::post('/{chat}/send', [ChatController::class, 'send'])->name('profile.chats.send');
