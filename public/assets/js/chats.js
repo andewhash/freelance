@@ -6,7 +6,7 @@ let messagesOffset = window.initialMessagesCount || 0;
 // ✅ Когда DOM готов
 document.addEventListener('DOMContentLoaded', () => {
     window.Echo.private('chat.1')
-        .listen('App\\Events\\MessageSent', (e) => { console.log(e); });
+        .listen('MessageSent', (e) => { console.log(e); });
 
 
     const loadMoreChatsBtn = document.querySelector('.load-more-chats');
